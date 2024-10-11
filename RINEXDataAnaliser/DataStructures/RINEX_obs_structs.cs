@@ -3,7 +3,7 @@
     /// <summary>
     /// Класс для хранения данных о спутниках в пределах одной эпохи
     /// </summary>
-    class RINEX_obs_epoch_data
+    public class RINEX_obs_epoch_data
     {
         /// <summary>
         /// Время эпохи
@@ -19,7 +19,7 @@
     /// <summary>
     /// Класс для хранения данных одного спутника в эпохе
     /// </summary>
-    class RINEX_obs_satelite_data
+    public class RINEX_obs_satelite_data
     {
         /// <summary>
         /// Словарь хранящий псевдофазы и псевдодальности спутника

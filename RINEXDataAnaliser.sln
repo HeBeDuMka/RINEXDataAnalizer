@@ -5,6 +5,11 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RINEXDataAnaliser", "RINEXDataAnaliser\RINEXDataAnaliser.csproj", "{3F54725C-BA26-475C-A776-FC7849440973}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RINEXDataAnaliser.Tests", "RINEXDataAnaliser.Tests\RINEXDataAnaliser.Tests.csproj", "{947F0FAF-0F9F-4528-92D2-AA17110B1BAB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3F54725C-BA26-475C-A776-FC7849440973} = {3F54725C-BA26-475C-A776-FC7849440973}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +20,10 @@ Global
 		{3F54725C-BA26-475C-A776-FC7849440973}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F54725C-BA26-475C-A776-FC7849440973}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F54725C-BA26-475C-A776-FC7849440973}.Release|Any CPU.Build.0 = Release|Any CPU
+		{947F0FAF-0F9F-4528-92D2-AA17110B1BAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{947F0FAF-0F9F-4528-92D2-AA17110B1BAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{947F0FAF-0F9F-4528-92D2-AA17110B1BAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{947F0FAF-0F9F-4528-92D2-AA17110B1BAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

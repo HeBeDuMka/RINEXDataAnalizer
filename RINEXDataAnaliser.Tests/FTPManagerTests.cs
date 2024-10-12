@@ -40,5 +40,29 @@ namespace RINEXDataAnaliser.Tests
 
             Assert.Equal(data, fileList);
         }
+
+        [Fact]
+        public void ChangeWorkingDirNoErrorRelativePath()
+        {
+            string data = "/test";
+
+            FTPManager ftpManager = new FTPManager("ftp://ftpupload", "b7_33706431", "logitech");
+
+            ftpManager.changeWorkingDir("/test");
+
+            Assert.Equal(data, ftpManager.curentWorkingDirectory);
+        }
+
+        [Fact]
+        public void ChangeWorkingDirNoErrorAbsolutePath()
+        {
+            string data = "/test/dir";
+
+            FTPManager ftpManager = new FTPManager("ftp://ftpupload", "b7_33706431", "logitech");
+
+            ftpManager.changeWorkingDir("/test/dir");
+
+            Assert.Equal(data, ftpManager.curentWorkingDirectory);
+        }
     }
 }

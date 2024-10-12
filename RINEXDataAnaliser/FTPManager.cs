@@ -91,5 +91,16 @@ namespace RINEXDataAnaliser
                 return new List<string>();
             }
         }
+        /// <summary>
+        /// Метод для смены текущей рабочей директории
+        /// </summary>
+        /// <param name="dirToChange">Путь к файлу/папке</param>
+        public void ChangeWorkingDir(string dirToChange)
+        {
+            if (dirToChange[0] == '/')
+                curentWorkingDirectory = dirToChange;
+            else
+                curentWorkingDirectory += dirToChange;
+        }
     }
 }

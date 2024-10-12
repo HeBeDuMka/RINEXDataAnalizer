@@ -15,19 +15,19 @@ namespace RINEXDataAnaliser
         /// <summary>
         /// Строка для хранения адреса FTP сервера
         /// </summary>
-        public string ftpUrl = "";
+        private string ftpUrl = "";
 
         /// <summary>
         /// Строка для хранения логина от FTP сервера
         /// </summary>
-        public string login = "";
+        private string login = "";
 
         /// <summary>
         /// Строка для хранения пароля от FTP сервера
         /// </summary>
-        public string password = "";
+        private string password = "";
 
-        public string curentWorkingDirectory = "/";
+        private string curentWorkingDirectory = "/";
 
         /// <summary>
         /// Конструктор для задания основных параметров FTP сервера

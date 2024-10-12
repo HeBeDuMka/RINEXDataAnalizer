@@ -102,5 +102,44 @@ namespace RINEXDataAnaliser
             else
                 curentWorkingDirectory += dirToChange;
         }
+
+        /// <summary>
+        /// Метод для скачивания файла с FTP сервера
+        /// </summary>
+        /// <param name="fileName">Имя файла для скачивания (из текущей рабочей директории)</param>
+        /// <param name="localFilePath">Локальный путь к папке в которую будет сохранен файл</param>
+        public void DownloadFile(string fileName, string localFilePath)
+        {
+            try
+            {
+                // Создаем объект FtpWebRequest для загрузки файла
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpUrl + curentWorkingDirectory + "/" + fileName);
+                request.Method = WebRequestMethods.Ftp.DownloadFile;
+                request.Credentials = new NetworkCredential(login, password);
+                request.UsePassive = true;
+                request.UseBinary = true;
+                request.KeepAlive = true;
+                request.Timeout = Timeout.Infinite;
+
+                // Получаем ответ от сервера
+                using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+                using (Stream responseStream = response.GetResponseStream())
+                using (FileStream outputStream = new FileStream(localFilePath + "\\" + fileName, FileMode.Create))
+                {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        outputStream.Write(buffer, 0, bytesRead);
+                    }
+                }
+
+                Console.WriteLine($"Файл скачан: {localFilePath + "\\" + fileName}");
+            }
+            catch (WebException ex)
+            {
+                Console.WriteLine($"Ошибка при загрузке файла: {ex.Message}");
+            }
+        }
     }
 }

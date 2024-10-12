@@ -6,23 +6,23 @@ namespace RINEXDataAnaliser.DataStructures
     /// <summary>
     /// Класс для хранения данных о спутниках в пределах одной эпохи
     /// </summary>
-    public class RINEX_obs_epoch_data
+    public class RINEXObsEpochData
     {
         /// <summary>
         /// Время эпохи
         /// </summary>
-        public DateTime epoch_time;
+        public DateTime epochTime;
 
         /// <summary>
         /// Словарь хранящий данные всех спутников в эпохе
         /// </summary>
-        public Dictionary<string, RINEX_obs_satelite_data> satelites_data = new Dictionary<string, RINEX_obs_satelite_data>();
+        public Dictionary<string, RINEXObsSateliteData> satelitesData = new Dictionary<string, RINEXObsSateliteData>();
     }
 
     /// <summary>
     /// Класс для хранения данных одного спутника в эпохе
     /// </summary>
-    public class RINEX_obs_satelite_data
+    public class RINEXObsSateliteData
     {
         /// <summary>
         /// Словарь хранящий псевдофазы и псевдодальности спутника
@@ -32,14 +32,14 @@ namespace RINEXDataAnaliser.DataStructures
         /// <summary>
         /// Словарь хранящий качество псевдофаз
         /// </summary>
-        public Dictionary<string, int> phase_quality = new Dictionary<string, int>();
+        public Dictionary<string, int> phaseQuality = new Dictionary<string, int>();
 
         /// <summary>
         /// Конструктор класс для парсинга данных одного спутника
         /// </summary>
         /// <param name="dataToParse">Данные для парсинга</param>
         /// <param name="regularException">Регулярное выражения для парсинга</param>
-        public RINEX_obs_satelite_data(string dataToParse, Regex regularException)
+        public RINEXObsSateliteData(string dataToParse, Regex regularException)
         {
             // С помощью регулярного выражения разбиваем строку
             Match match = regularException.Match(dataToParse);
@@ -55,7 +55,7 @@ namespace RINEXDataAnaliser.DataStructures
                     // псевдофазы или псевдодальности
                     if (group.Name.Contains("quality"))
                         // Записываем в соответствующий массив
-                        phase_quality.Add(group.Name, Convert.ToInt32(group.Value));
+                        phaseQuality.Add(group.Name, Convert.ToInt32(group.Value));
                     // Если нет, то это данные
                     else
                         // Записываем в соответствующий массив

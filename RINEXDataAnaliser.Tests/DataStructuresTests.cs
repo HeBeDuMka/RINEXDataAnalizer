@@ -27,7 +27,7 @@ namespace RINEXDataAnaliser.Tests
 
 			Regex regex = new Regex(regexString, RegexOptions.Compiled);
 
-			RINEX_obs_satelite_data obs_Satelite_Data = new RINEX_obs_satelite_data(data, regex);
+			RINEXObsSateliteData obs_Satelite_Data = new RINEXObsSateliteData(data, regex);
 
             Assert.Equal(dataDict, obs_Satelite_Data.data);
         }

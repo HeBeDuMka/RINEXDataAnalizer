@@ -45,7 +45,7 @@ namespace RINEXDataAnaliser
         /// <summary>
         /// Метод для подключения к FTP серверу
         /// </summary>
-        public List<string> getFileList()
+        public List<string> GetFileList()
         {
             List<string> result = new List<string>();
 

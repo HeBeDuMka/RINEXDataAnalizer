@@ -23,7 +23,7 @@ namespace RINEXDataAnaliser.Tests
 
             FTPManager ftpManager = new FTPManager("ftp://ftpupload.net", "b7_33706431", "logitech");
 
-            List<string> fileList = ftpManager.getFileList();
+            List<string> fileList = ftpManager.GetFileList();
             fileList.Sort();
 
             Assert.Equal(data, fileList);
@@ -36,7 +36,7 @@ namespace RINEXDataAnaliser.Tests
 
             FTPManager ftpManager = new FTPManager("ftp://ftpupload", "b7_33706431", "logitech");
 
-            List<string> fileList = ftpManager.getFileList();
+            List<string> fileList = ftpManager.GetFileList();
 
             Assert.Equal(data, fileList);
         }
@@ -48,7 +48,7 @@ namespace RINEXDataAnaliser.Tests
 
             FTPManager ftpManager = new FTPManager("ftp://ftpupload", "b7_33706431", "logitech");
 
-            ftpManager.changeWorkingDir("/test");
+            ftpManager.ChangeWorkingDir("/test");
 
             Assert.Equal(data, ftpManager.curentWorkingDirectory);
         }
@@ -60,7 +60,7 @@ namespace RINEXDataAnaliser.Tests
 
             FTPManager ftpManager = new FTPManager("ftp://ftpupload", "b7_33706431", "logitech");
 
-            ftpManager.changeWorkingDir("/test/dir");
+            ftpManager.ChangeWorkingDir("/test/dir");
 
             Assert.Equal(data, ftpManager.curentWorkingDirectory);
         }

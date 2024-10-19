@@ -20,7 +20,7 @@ namespace RINEXDataAnaliser
         public RegexManager()
         {
             obsHeader.Add("RINEX VERSION / TYPE", new Regex(@"\s+(?<Rinex_version>\d{1}\.\d{2})\s+(?<Rinex_type>\w+\s\w+)\s+(?<Satelite_system>\w)\s+", RegexOptions.Compiled));
-            obsHeader.Add("PGM / RUN BY / DATE", new Regex(@"(?<Record_program_name>[a-zA-Z0-9.-]*)\s+(?<Record_agency_name>[a-zA-Z0-9.-])?\s+(?<Record_date>\d+)\s(?<Record_time>\d+)\s(?<Time_zone>\w+)\s+", RegexOptions.Compiled));
+            obsHeader.Add("PGM / RUN BY / DATE", new Regex(@"(?<Record_program_name>[a-zA-Z0-9.-]*)\s+(?<Record_agency_name>[a-zA-Z0-9.-])?\s+(?<Record_date_time>\d+\s\d+)\s(?<Time_zone>\w+)\s+", RegexOptions.Compiled));
             obsHeader.Add("COMMENT", new Regex("[a-zA-Z0-9\\(\\) .-]+", RegexOptions.Compiled));
             obsHeader.Add("MARKER NAME", new Regex(@"(?<Marker_name>[a-zA-Z0-9\(\) .-]+)\s*", RegexOptions.Compiled));
             obsHeader.Add("MARKER NUMBER", new Regex(@"(?<Marker_number>[a-zA-Z0-9\(\) .-]+)\s*", RegexOptions.Compiled));
@@ -30,7 +30,7 @@ namespace RINEXDataAnaliser
             obsHeader.Add("ANT # / TYPE", new Regex(@"(?<Antenna_number>\w+)\s+(?<Antenna_type_1>\w+)\s+(?<Antenna_type_2>\w+)\s+", RegexOptions.Compiled));
             obsHeader.Add("APPROX POSITION XYZ", new Regex(@"\s+(?<Antenna_position_x>\w+\.\w+)\s+(?<Antenna_position_y>\w+\.\w+)\s+(?<Antenna_position_z>\w+\.\w+)\s+", RegexOptions.Compiled));
             obsHeader.Add("ANTENNA: DELTA H/E/N", new Regex(@"\s+(?<Antenna_delta_h>\w+\.\w+)\s+(?<Antenna_delta_e>\w+\.\w+)\s+(?<Antenna_delta_n>\w+\.\w+)\s+", RegexOptions.Compiled));
-            obsHeader.Add("SYS / # / OBS TYPES", new Regex(@"(?<Satelite_group>\w)\s+(?<GPS_sat_count>\w+)\s+(?<GPS_obs_descriptors>[A-Z0-9 ]+)\s*", RegexOptions.Compiled));
+            obsHeader.Add("SYS / # / OBS TYPES", new Regex(@"(?<Satelite_group>\w)\s+(?<Sat_count>\w+)\s+(?<Obs_descriptors>[A-Z0-9 ]+)\s*", RegexOptions.Compiled));
             obsHeader.Add("SYS / PHASE SHIFT", new Regex(@"(?<Satelite_group>\w)\s(?<Descriptor>\w+)\s+(?<Phase_shift>\d+.\d+)?\s+", RegexOptions.Compiled));
             obsHeader.Add("TIME OF FIRST OBS", new Regex(@"\s+(?<First_obs_date>\d+\s+\d+\s+\d+)\s+(?<First_obs_time>\d+\s+\d+\s+[0-9.]+)\s+(?<Time_system>\w+)\s+", RegexOptions.Compiled));
         }

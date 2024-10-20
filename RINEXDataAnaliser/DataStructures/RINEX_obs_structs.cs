@@ -186,4 +186,114 @@ namespace RINEXDataAnaliser.DataStructures
         /// </summary>
         public List<string> typesDescriptors = new();
     }
+
+    public class RINEXObsFile
+    {
+        /// <summary>
+        /// Заголовок RINEX файла
+        /// </summary>
+        public RINEXObsHeaderData header = new();
+
+        /// <summary>
+        /// Данные RINEX файла
+        /// </summary>
+        public List<RINEXObsEpochData> epochDatas = new();
+
+        public void ParseFile(string filePath)
+        {
+            // Считываем все строки из файла
+            string[] fileLines = File.ReadAllLines(filePath);
+            bool isHeader = true;
+            RegexManager regexManager = new RegexManager();
+            foreach(string line in fileLines)
+            {
+                if (isHeader)
+                {
+                    Match match;
+                    if (line.EndsWith("APPROX POSITION XYZ"))
+                    {
+                        match = regexManager.obsHeader["APPROX POSITION XYZ"].Match(line);
+                        if (match.Success){
+                            header.approxPosition.X = Convert.ToDouble(match.Groups["Antenna_position_x"].Value, CultureInfo.InvariantCulture);
+                            header.approxPosition.Y = Convert.ToDouble(match.Groups["Antenna_position_y"].Value, CultureInfo.InvariantCulture);
+                            header.approxPosition.Z = Convert.ToDouble(match.Groups["Antenna_position_z"].Value, CultureInfo.InvariantCulture);
+                        }
+                    }
+                    else if (line.EndsWith("SYS / # / OBS TYPES"))
+                    {
+                        match = regexManager.obsHeader["SYS / # / OBS TYPES"].Match(line);
+                        if (match.Success)
+                        {
+                            RINEXObsTypes obsTypes = new();
+                            obsTypes.systemCode = match.Groups["Satelite_group"].Value;
+                            obsTypes.typesCount = Convert.ToInt32(match.Groups["Sat_count"].Value);
+                            obsTypes.typesDescriptors = match.Groups["Obs_descriptors"].Value.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList<string>();
+                            header.obsTypes.Add(obsTypes);
+                        }
+                    }
+                    else if (line.EndsWith("END OF HEADER"))
+                    {
+                        isHeader = false;
+                        foreach (RINEXObsTypes obsType in header.obsTypes)
+                        {
+                            string regexString = @"(?<Satelite_number>\w\d{2})";
+
+                            foreach (string descriptor in obsType.typesDescriptors)
+                            {
+                                regexString += @"\s+(?<{}>[0-9\-]+\.\d{3})(?<{}_LLI>\d)?\s?(?<{}_SSI>\d)?".Replace("{}", descriptor);
+                            }
+
+                            regexManager.obsEpohs.Add(obsType.systemCode, new Regex(regexString, RegexOptions.Compiled));
+                        }
+                    }
+                    //if (line.EndsWith("RINEX VERSION / TYPE"))
+                    //{
+                    //    match = regexManager.obsHeader["RINEX VERSION / TYPE"].Match(line);
+                    //    header.fileVersion = match.Groups["Rinex_version"].Value;
+                    //    header.sateliteSystems = match.Groups["Satelite_system"].Value;
+                    //}
+                    //else if (line.EndsWith("PGM / RUN BY / DATE"))
+                    //{
+                    //    match = regexManager.obsHeader["PGM / RUN BY / DATE"].Match(line);
+                    //    header.programNameCreate = match.Groups["Record_program_name"].Value;
+                    //    header.dateTimeCreate = DateTime.ParseExact(match.Groups["Record_date_time"].Value, "yyyyMMdd hhmmss", CultureInfo.InvariantCulture);
+                    //    header.timeZone = match.Groups["Time_zone"].Value;
+                    //}
+                    //else if (line.EndsWith("COMMENT"))
+                    //{
+                    //    match = regexManager.obsHeader["COMMENT"].Match(line);
+                    //    header.comments.Add(match.Groups[0].Value);
+                    //}
+                    //else if (line.EndsWith("MARKER NAME"))
+                    //{
+                    //    match = regexManager.obsHeader["MARKER_NAME"].Match(line);
+                    //    header.antennaMarkerName = match.Groups["Marker_name"].Value;
+                    //}
+                    //else if (line.EndsWith("MARKER NUMBER"))
+                    //{
+                    //    match = regexManager.obsHeader["MARKER_NUMBER"].Match(line);
+                    //    header.antennaMarkerNumber = match.Groups["Marker_number"].Value;
+                    //}
+                    //else if (line.EndsWith("MARKER TYPE"))
+                    //{
+                    //    match = regexManager.obsHeader["MARKER TYPE"].Match(line);
+                    //    header.antennaMarkerNumber = match.Groups["Marker_type"].Value;
+                    //}
+                    //else if (line.EndsWith("OBSERVER / AGENCY"))
+                    //{
+                    //    match = regexManager.obsHeader["MARKER_NUMBER"].Match(line);
+                    //    header.observerName = match.Groups["Marker_number"].Value;
+                    //}
+                }
+                else
+                {
+                    if (line.StartsWith(">"))
+                    {
+                        Match match = regexManager.obsEpohs["Data"].Match(line);
+                        RINEXObsEpochData epochData = new RINEXObsEpochData();
+                    }
+                }
+            }
+        }
+    }
 }

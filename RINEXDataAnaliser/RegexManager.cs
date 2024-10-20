@@ -13,9 +13,15 @@ namespace RINEXDataAnaliser
     public class RegexManager
     {
         /// <summary>
-        /// Регулярное выражение для парсинга заголовка файла с наблюдениями
+        /// Список регулярных выражений для парсинга заголовка файла с наблюдениями
         /// </summary>
         public Dictionary<string, Regex> obsHeader = new Dictionary<string, Regex>();
+
+        /// <summary>
+        /// Список регулярных выражений для парсинга данных спутников в эпохе файла с наблюдениями
+        /// Первое из них для парсинга даты и времени эпохи
+        /// </summary>
+        public Dictionary<string, Regex> obsEpohs = new Dictionary<string, Regex>();
 
         public RegexManager()
         {
@@ -30,9 +36,11 @@ namespace RINEXDataAnaliser
             obsHeader.Add("ANT # / TYPE", new Regex(@"(?<Antenna_number>\w+)\s+(?<Antenna_type_1>\w+)\s+(?<Antenna_type_2>\w+)\s+", RegexOptions.Compiled));
             obsHeader.Add("APPROX POSITION XYZ", new Regex(@"\s+(?<Antenna_position_x>\w+\.\w+)\s+(?<Antenna_position_y>\w+\.\w+)\s+(?<Antenna_position_z>\w+\.\w+)\s+", RegexOptions.Compiled));
             obsHeader.Add("ANTENNA: DELTA H/E/N", new Regex(@"\s+(?<Antenna_delta_h>\w+\.\w+)\s+(?<Antenna_delta_e>\w+\.\w+)\s+(?<Antenna_delta_n>\w+\.\w+)\s+", RegexOptions.Compiled));
-            obsHeader.Add("SYS / # / OBS TYPES", new Regex(@"(?<Satelite_group>\w)\s+(?<Sat_count>\w+)\s+(?<Obs_descriptors>[A-Z0-9 ]+)\s*", RegexOptions.Compiled));
+            obsHeader.Add("SYS / # / OBS TYPES", new Regex(@"(?<Satelite_group>\w)\s+(?<Sat_count>\w+)\s+(?<Obs_descriptors>[A-Z0-9 ]+)\s*SYS / # / OBS TYPES", RegexOptions.Compiled));
             obsHeader.Add("SYS / PHASE SHIFT", new Regex(@"(?<Satelite_group>\w)\s(?<Descriptor>\w+)\s+(?<Phase_shift>\d+.\d+)?\s+", RegexOptions.Compiled));
             obsHeader.Add("TIME OF FIRST OBS", new Regex(@"\s+(?<First_obs_date>\d+\s+\d+\s+\d+)\s+(?<First_obs_time>\d+\s+\d+\s+[0-9.]+)\s+(?<Time_system>\w+)\s+", RegexOptions.Compiled));
+
+            obsEpohs.Add("Date", new Regex(@">\s(?<Year>\d{4})\s(?<Month>\d{2})\s(?<Day>\d{2})\s(?<Hour>\d{2})\s(?<Minute>\d{2})\s+(?<Second>[0-9.]+)\s+(?<Epoch_flag>\d{1})\s(?<Satelites_count>\d+)", RegexOptions.Compiled));
         }
     }
 }

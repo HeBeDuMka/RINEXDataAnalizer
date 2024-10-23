@@ -19,50 +19,38 @@ namespace RINEXDataAnaliser.DataStructures
         public Dictionary<string, RINEXObsSateliteData> satelitesData = new Dictionary<string, RINEXObsSateliteData>();
     }
 
+    public class RINEXObsSateliteMeasuring
+    {
+        /// <summary>
+        /// Поле хранящее значение измерения 
+        /// </summary>
+        public double value;
+
+        /// <summary>
+        /// Поле хранящее байт состояния сигнала
+        /// </summary>
+        public int LLI;
+
+        /// <summary>
+        /// Поле хранящее уровнь сигнал/шум
+        /// </summary>
+        public int SSI;
+    }
+
     /// <summary>
     /// Класс для хранения данных одного спутника в эпохе
     /// </summary>
     public class RINEXObsSateliteData
     {
         /// <summary>
-        /// Словарь хранящий псевдофазы и псевдодальности спутника
+        /// Словарь хранящий все псевдодальности спутника в текущей эпохе
         /// </summary>
-        public Dictionary<string, double> data = new Dictionary<string, double>();
+        public Dictionary<string, RINEXObsSateliteMeasuring> pseudoranges = new();
 
         /// <summary>
-        /// Словарь хранящий качество псевдофаз
+        /// Словарь хранящий все псевдофазы спутника в текущей эпохе
         /// </summary>
-        public Dictionary<string, int> phaseQuality = new Dictionary<string, int>();
-
-        /// <summary>
-        /// Конструктор класс для парсинга данных одного спутника
-        /// </summary>
-        /// <param name="dataToParse">Данные для парсинга</param>
-        /// <param name="regularException">Регулярное выражения для парсинга</param>
-        public RINEXObsSateliteData(string dataToParse, Regex regularException)
-        {
-            // С помощью регулярного выражения разбиваем строку
-            Match match = regularException.Match(dataToParse);
-
-            // Запускаем цикл по полученным результатам
-            foreach (Group group in match.Groups)
-            {
-                // Первым элементом результатов будет изначальная строка, поэтому пропускаем её,
-                // также пропускаем пустые значения
-                if (group.Value != dataToParse && group.Value != "")
-                {
-                    // Если в названии параметра присутствует "quality", то это значение качества
-                    // псевдофазы или псевдодальности
-                    if (group.Name.Contains("quality"))
-                        // Записываем в соответствующий массив
-                        phaseQuality.Add(group.Name, Convert.ToInt32(group.Value));
-                    // Если нет, то это данные
-                    else
-                        // Записываем в соответствующий массив
-                        data.Add(group.Name, Convert.ToDouble(group.Value, CultureInfo.InvariantCulture));
-                }
-            }
-        }
+        public Dictionary<string, RINEXObsSateliteMeasuring> pseudophases = new();
     }
 
     /// <summary>

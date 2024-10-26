@@ -70,7 +70,6 @@ namespace RINEXDataAnaliser
                         using (StreamReader reader = new StreamReader(responseStream))
                         {
                             string line;
-                            Console.WriteLine("Список файлов и папок на FTP сервере:");
                             while ((line = reader.ReadLine()) != null)
                             {
                                 result.Add(line);
@@ -101,6 +100,23 @@ namespace RINEXDataAnaliser
                 curentWorkingDirectory = dirToChange;
             else
                 curentWorkingDirectory += dirToChange;
+        }
+
+        // Определение, является ли строка папкой
+        private bool IsDirectory(string details)
+        {
+            // Обычно строки, представляющие папки, имеют специальное обозначение. 
+            // Например, в Unix-системах папки могут начинаться с 'd' в строках `ls -l`.
+            return details.ToLower().StartsWith("d");
+        }
+
+        // Извлечение имени файла или папки из строки
+        private string ExtractNameFromLine(string details)
+        {
+            // В строке могут содержаться различная информация, например, права доступа, размер и т.д.
+            // Извлекаем последнее слово как имя файла или папки.
+            string[] parts = details.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            return parts[parts.Length - 1];
         }
 
         /// <summary>
@@ -139,6 +155,64 @@ namespace RINEXDataAnaliser
             catch (WebException ex)
             {
                 Console.WriteLine($"Ошибка при загрузке файла: {ex.Message}");
+            }
+        }
+
+        // Функция для создания временной директории
+        public string CreateTempDirectory()
+        {
+            string tempPath = Path.GetTempPath(); // Получаем путь к системной временной директории
+            string tempFolder = Path.Combine(tempPath, Path.GetRandomFileName()); // Генерируем уникальное имя папки
+            Directory.CreateDirectory(tempFolder); // Создаем директорию
+
+            Console.WriteLine($"Создана временная директория: {tempFolder}");
+            return tempFolder; // Возвращаем путь к созданной временной директории
+        }
+
+        public void DownloadFilesRecursively(string ftpUrl, string username, string password, string localPath)
+        {
+            try
+            {
+                // Создаем объект FtpWebRequest для получения списка файлов и папок
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpUrl);
+                request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
+                request.Credentials = new NetworkCredential(username, password);
+                request.UsePassive = true;
+                request.UseBinary = true;
+                request.KeepAlive = false;
+
+                // Получаем ответ от сервера
+                using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+                using (Stream responseStream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(responseStream))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        // Определяем, файл это или папка
+                        if (IsDirectory(line))
+                        {
+                            // Это папка, рекурсивно скачиваем содержимое
+                            string folderName = ExtractNameFromLine(line);
+                            string newLocalPath = Path.Combine(localPath, folderName);
+                            Directory.CreateDirectory(newLocalPath); // Создаем локальную директорию
+
+                            // Рекурсивный вызов функции для скачивания содержимого папки
+                            DownloadFilesRecursively($"{ftpUrl}/{folderName}", username, password, newLocalPath);
+                        }
+                        else
+                        {
+                            // Это файл, скачиваем его
+                            string fileName = ExtractNameFromLine(line);
+                            string localFilePath = Path.Combine(localPath, fileName);
+                            DownloadFile(fileName, localFilePath);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при загрузке: {ex.Message}");
             }
         }
     }

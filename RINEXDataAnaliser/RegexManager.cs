@@ -23,6 +23,11 @@ namespace RINEXDataAnaliser
         /// </summary>
         public Dictionary<string, Regex> obsEpohs = new Dictionary<string, Regex>();
 
+        /// <summary>
+        /// Список регулярных выражений для парсинга данных спутников в эпохе файла с эфимеридами GPS
+        /// </summary>
+        public Dictionary<string, Regex> gpsNavEpohs = new();
+
         public RegexManager()
         {
             obsHeader.Add("RINEX VERSION / TYPE", new Regex(@"\s+(?<Rinex_version>\d{1}\.\d{2})\s+(?<Rinex_type>\w+\s\w+)\s+(?<Satelite_system>\w)\s+", RegexOptions.Compiled));
@@ -41,6 +46,16 @@ namespace RINEXDataAnaliser
             obsHeader.Add("TIME OF FIRST OBS", new Regex(@"\s+(?<First_obs_date>\d+\s+\d+\s+\d+)\s+(?<First_obs_time>\d+\s+\d+\s+[0-9.]+)\s+(?<Time_system>\w+)\s+", RegexOptions.Compiled));
 
             obsEpohs.Add("Date", new Regex(@">\s(?<Year>\d{4})\s(?<Month>\d{2})\s(?<Day>\d{2})\s(?<Hour>\d{2})\s(?<Minute>\d{2})\s+(?<Second>\d+).\d+\s+(?<Epoch_flag>\d{1})\s(?<Satelites_count>\d+)", RegexOptions.Compiled));
+
+            //https://regex101.com/r/KIdcVR/1
+            gpsNavEpohs.Add("SV / EPOCH / SV CLK", new Regex(@"(?<SateliteNumber>\w{3})\s(?<Year>\d{4})\s(?<Month>\d{2})\s(?<Day>\d{2})\s+(?<Hour>\d{1,2})\s+(?<Minute>\d{1,2})\s+(?<Second>\d{1,2})(?<ClockBias>[0-9\.\-\D]{19})(?<ClockDrift>[0-9\.\-\D]{19})(?<ClockDriftRate>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            gpsNavEpohs.Add("BROADCAST ORBIT - 1", new Regex(@"\s{4}(?<IODE>[0-9\.\-\D]{19})(?<Crs>[0-9\.\-\D]{19})(?<DeltaN>[0-9\.\-\D]{19})(?<M0>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            gpsNavEpohs.Add("BROADCAST ORBIT - 2", new Regex(@"\s{4}(?<Cuc>[0-9\.\-\D]{19})(?<E>[0-9\.\-\D]{19})(?<Cus>[0-9\.\-\D]{19})(?<SqrtA>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            gpsNavEpohs.Add("BROADCAST ORBIT - 3", new Regex(@"\s{4}(?<TTOE>[0-9\.\-\D]{19})(?<Cic>[0-9\.\-\D]{19})(?<Omega0>[0-9\.\-\D]{19})(?<Cis>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            gpsNavEpohs.Add("BROADCAST ORBIT - 4", new Regex(@"\s{4}(?<I0>[0-9\.\-\D]{19})(?<Crc>[0-9\.\-\D]{19})(?<Omega>[0-9\.\-\D]{19})(?<OmegaDot>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            gpsNavEpohs.Add("BROADCAST ORBIT - 5", new Regex(@"\s{4}(?<IDot>[0-9\.\-\D]{19})(?<CodesOnL2Chanel>[0-9\.\-\D]{19})(?<GpsWeek>[0-9\.\-\D]{19})(?<L2PDataFlag>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            gpsNavEpohs.Add("BROADCAST ORBIT - 6", new Regex(@"\s{4}(?<SVAccuracy>[0-9\.\-\D]{19})(?<SVHealth>[0-9\.\-\D]{19})(?<TGD>[0-9\.\-\D]{19})(?<IODC>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            gpsNavEpohs.Add("BROADCAST ORBIT - 7", new Regex(@"\s{4}(?<TransmitionTimeOfMessage>[0-9\.\-\D]{19})", RegexOptions.Compiled));
         }
     }
 }

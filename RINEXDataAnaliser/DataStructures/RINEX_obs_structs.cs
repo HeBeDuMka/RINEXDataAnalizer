@@ -187,13 +187,12 @@ namespace RINEXDataAnaliser.DataStructures
         /// </summary>
         public List<RINEXObsEpochData> epochDatas = new();
 
-        public void ParseFile(string filePath)
+        public void ParseFile(string filePath, RegexManager regexManager)
         {
             // Считываем все строки из файла
             string[] fileLines = File.ReadAllLines(filePath);
             bool isHeader = true;
-            RegexManager regexManager = new RegexManager();
-            foreach(string line in fileLines)
+            foreach(string line in File.ReadLines(filePath))
             {
                 if (isHeader)
                 {

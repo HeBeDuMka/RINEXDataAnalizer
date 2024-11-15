@@ -18,6 +18,21 @@ namespace RINEXDataAnaliser.DataStructures
         /// </summary>
         public List<RINEXNavGPSData> data = new();
 
+        public RINEXNavGPSData findNeedEpoch(string sateliteNumber, DateTime needEpochTime)
+        {
+            TimeSpan ephemStep = new TimeSpan(2, 0, 0);
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (sateliteNumber == data[i].sateliteNumber &&
+                    (needEpochTime - ephemStep) < data[i].dateTime)
+                {
+                    return data[i];
+                }
+            }
+
+            return null;
+        }
+
         private enum ParseStates
         {
             EpochStart,
@@ -30,7 +45,7 @@ namespace RINEXDataAnaliser.DataStructures
             BroadcastOrbit7
         }
 
-        public void ParceNavFile(string filePath, RegexManager regexManager)
+        public void ParceFile(string filePath, RegexManager regexManager)
         {
             bool isHeader = true;
             ParseStates parseState = ParseStates.EpochStart;

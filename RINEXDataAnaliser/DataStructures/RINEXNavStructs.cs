@@ -3,6 +3,19 @@ using System.Globalization;
 
 namespace RINEXDataAnaliser.DataStructures
 {
+
+    public enum ParseStates
+    {
+        EpochStart,
+        BroadcastOrbit1,
+        BroadcastOrbit2,
+        BroadcastOrbit3,
+        BroadcastOrbit4,
+        BroadcastOrbit5,
+        BroadcastOrbit6,
+        BroadcastOrbit7
+    }
+
     /// <summary>
     /// Класс для хранения эфимерид из GPS файла
     /// </summary>
@@ -31,18 +44,6 @@ namespace RINEXDataAnaliser.DataStructures
             }
 
             return null;
-        }
-
-        private enum ParseStates
-        {
-            EpochStart,
-            BroadcastOrbit1,
-            BroadcastOrbit2,
-            BroadcastOrbit3,
-            BroadcastOrbit4,
-            BroadcastOrbit5,
-            BroadcastOrbit6,
-            BroadcastOrbit7
         }
 
         public void ParceFile(string filePath, RegexManager regexManager)
@@ -76,8 +77,8 @@ namespace RINEXDataAnaliser.DataStructures
                                                                    Convert.ToInt16(match.Groups["Minute"].Value),
                                                                    Convert.ToInt16(match.Groups["Second"].Value));
                                 navGPSData.clockBias = Convert.ToDouble(match.Groups["ClockBias"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
-                                navGPSData.clockDrift = Convert.ToDouble(match.Groups["ClockDrift"].Value.Replace("D", "E").Replace("D", "E"), CultureInfo.InvariantCulture);
-                                navGPSData.clockDriftRate = Convert.ToDouble(match.Groups["ClockDriftRate"].Value.Replace("D", "E").Replace("D", "E"), CultureInfo.InvariantCulture);
+                                navGPSData.clockDrift = Convert.ToDouble(match.Groups["ClockDrift"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                navGPSData.clockDriftRate = Convert.ToDouble(match.Groups["ClockDriftRate"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
                                 data.Add(navGPSData);
                                 parseState = ParseStates.BroadcastOrbit1;
                             }
@@ -251,5 +252,123 @@ namespace RINEXDataAnaliser.DataStructures
         public double iodc = 0.0;
 
         public double transmitionTimeOfMessage = 0.0;
+    }
+
+    public class RINEXNavGLONASSFile
+    {
+        public RINEXNavGLONASSHeader header = new();
+        public List<RINEXNavGLONASSData> data = new();
+
+        public RINEXNavGLONASSData findNeedEpoch(string sateliteNumber, DateTime needEpochTime)
+        {
+            TimeSpan ephemStep = new TimeSpan(2, 0, 0);
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (sateliteNumber == data[i].sateliteNumber &&
+                    (needEpochTime - ephemStep) < data[i].epochTime)
+                {
+                    return data[i];
+                }
+            }
+
+            return null;
+        }
+
+        public void parceFile(string filePath, RegexManager regexManager)
+        {
+            bool isHeader = true;
+            ParseStates parseState = ParseStates.EpochStart;
+            foreach (string fileLine in File.ReadLines(filePath))
+            {
+                if (isHeader)
+                {
+                    if (fileLine.Contains("END OF HEADER"))
+                    {
+                        isHeader = false;
+                    }
+                }
+                else
+                {
+                    Match match;
+                    switch (parseState)
+                    {
+                        case ParseStates.EpochStart:
+                            match = regexManager.gloNavEpohs["SV / EPOCH / SV CLK"].Match(fileLine);
+                            if (match.Success)
+                            {
+                                RINEXNavGLONASSData navGLONASSData = new();
+                                navGLONASSData.sateliteNumber = match.Groups["SateliteNumber"].Value;
+                                navGLONASSData.epochTime = new DateTime(Convert.ToInt16(match.Groups["Year"].Value),
+                                                                        Convert.ToInt16(match.Groups["Month"].Value),
+                                                                        Convert.ToInt16(match.Groups["Day"].Value),
+                                                                        Convert.ToInt16(match.Groups["Hour"].Value),
+                                                                        Convert.ToInt16(match.Groups["Minute"].Value),
+                                                                        Convert.ToInt16(match.Groups["Second"].Value));
+                                navGLONASSData.clockBias = Convert.ToDouble(match.Groups["ClockBias"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                navGLONASSData.frequencyBias = Convert.ToDouble(match.Groups["FreqBias"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                navGLONASSData.messageFrameTime = Convert.ToDouble(match.Groups["MessageFrameTime"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                data.Add(navGLONASSData);
+                                parseState = ParseStates.BroadcastOrbit1;
+                            }
+                            break;
+                        case ParseStates.BroadcastOrbit1:
+                            match = regexManager.gloNavEpohs["BROADCAST ORBIT - 1"].Match(fileLine);
+                            if (match.Success)
+                            {
+                                data.Last().satelitePos.X = Convert.ToDouble(match.Groups["SatelitePosX"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                data.Last().sateliteVelocity.X = Convert.ToDouble(match.Groups["VelocityX"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                data.Last().sateliteAcceleration.X = Convert.ToDouble(match.Groups["AccelerationX"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                data.Last().health = Convert.ToDouble(match.Groups["Health"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                parseState = ParseStates.BroadcastOrbit2;
+                            }
+                            break;
+                        case ParseStates.BroadcastOrbit2:
+                            match = regexManager.gloNavEpohs["BROADCAST ORBIT - 2"].Match(fileLine);
+                            if (match.Success)
+                            {
+                                data.Last().satelitePos.Y = Convert.ToDouble(match.Groups["SatelitePosY"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                data.Last().sateliteVelocity.Y = Convert.ToDouble(match.Groups["VelocityY"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                data.Last().sateliteAcceleration.Y = Convert.ToDouble(match.Groups["AccelerationY"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                data.Last().freqencyNumber = Convert.ToDouble(match.Groups["FrequencyNumber"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                parseState = ParseStates.BroadcastOrbit3;
+                            }
+                            break;
+                        case ParseStates.BroadcastOrbit3:
+                            match = regexManager.gloNavEpohs["BROADCAST ORBIT - 3"].Match(fileLine);
+                            if (match.Success)
+                            {
+                                data.Last().satelitePos.Z = Convert.ToDouble(match.Groups["SatelitePosZ"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                data.Last().sateliteVelocity.Z = Convert.ToDouble(match.Groups["VelocityZ"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                data.Last().sateliteAcceleration.Z = Convert.ToDouble(match.Groups["AccelerationZ"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                data.Last().ageOfOperInfo = Convert.ToDouble(match.Groups["AgeOfOperInfo"].Value.Replace("D", "E"), CultureInfo.InvariantCulture);
+                                parseState = ParseStates.EpochStart;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    public class RINEXNavGLONASSHeader
+    {
+
+    }
+
+    public class RINEXNavGLONASSData
+    {
+        public string sateliteNumber = "";
+        public DateTime epochTime;
+        public double clockBias = 0.0;
+        public double frequencyBias = 0.0;
+        public double messageFrameTime = 0.0;
+        public XYZCoordinates satelitePos = new();
+        public XYZCoordinates sateliteVelocity = new();
+        public XYZCoordinates sateliteAcceleration = new();
+        public double health = 0.0;
+        public double freqencyNumber = 0.0;
+        public double ageOfOperInfo= 0.0;
     }
 }

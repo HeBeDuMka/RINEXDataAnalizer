@@ -20,22 +20,18 @@ namespace RINEXDataAnaliser
             obsFile.ParseFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\SU5200RUS_R_20233610000_01H_01S_MO.obs", regexManager);
             RINEXNavGPSFile gpsFile = new();
             gpsFile.ParceFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3610.23n", regexManager);
+            RINEXNavGLONASSFile glonassFile = new();
+            glonassFile.parceFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3610.23g", regexManager);
             CoordFinder coordFinder = new CoordFinder();
-            List<CalcEpoch> satsCoords = coordFinder.findSateliteCoord(obsFile, gpsFile);
-            List<CalcEpoch> satsCoordsAlm = coordFinder.findSateliteCoordsAlm(obsFile, gpsFile);
+            List<CalcEpoch> satsCoords = coordFinder.findSateliteCoord(obsFile, gpsFile, glonassFile, CalcOptions.GPS);
             List<XYZCoordinates> pointXYZCoords = coordFinder.findPointCoordinates(satsCoords);
-            List<XYZCoordinates> pointXYZCoordsAlm = coordFinder.findPointCoordinates(satsCoordsAlm);
 
             List<ELLCoordinates> pointELLCoords = new();
-            List<ELLCoordinates> pointELLCoordsAlm = new();
             foreach (XYZCoordinates coords in pointXYZCoords)
             {
                 ELLCoordinates ellCoordinates = new ELLCoordinates();
                 ellCoordinates.fromXYZ(coords);
                 pointELLCoords.Add(ellCoordinates);
-                ELLCoordinates ellCoordinatesAlm = new ELLCoordinates();
-                ellCoordinatesAlm.fromXYZ(coords);
-                pointELLCoordsAlm.Add(ellCoordinates);
             }
 
             return 0;

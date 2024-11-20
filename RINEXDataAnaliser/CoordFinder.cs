@@ -34,6 +34,7 @@ namespace RINEXDataAnaliser
         public Dictionary<string, RINEXObsSateliteMeasuring> pseudoranges = new();
         public Dictionary<string, RINEXObsSateliteMeasuring> pseudophases = new();
         public XYZCoordinates coordinates = new();
+        public double deltaSysTime;
     }
 
     public class CoordFinder
@@ -161,46 +162,53 @@ namespace RINEXDataAnaliser
             return s;
         }
 
-        public List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, double tolerance = 1e-4, int maxIterations = 100)
+        public List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, double tolerance = 1e-12, int maxIterations = 100)
         {
             List<XYZCoordinates> pointCoordinates = new();
 
             foreach (var epochData in epochsData)
             {
-                // Начальные приближения координат
+                // Начальные приближения координат и смещение часов приемника относительно часов системы (в метрах)
                 double x = 0, y = 0, z = 0, dt = 0;
+                double dx = 0, dy = 0, dz = 0, ddt = 0;
+                int iterationNumber = 0;
 
-                int numSatelites = epochData.satelitesData.Count;
-                double[] residuals = new double[numSatelites];
-                double[,] A = new double[numSatelites, 4];
-                int i = 0;
-
-                foreach (var (sateliteNumber, sateliteData) in epochData.satelitesData)
+                do
                 {
-                    double x_i = sateliteData.coordinates.X;
-                    double y_i = sateliteData.coordinates.Y;
-                    double z_i = sateliteData.coordinates.Z;
+                    int satelitesCount = epochData.satelitesData.Count;
+                    double[,] Hs = new double[satelitesCount, 4];
+                    double[] Es = new double[satelitesCount];
+                    int lineNumber = 0;
 
-                    double distance = Math.Sqrt(Math.Pow(x - x_i, 2) + Math.Pow(y - y_i, 2) + Math.Pow(z - z_i, 2));
+                    foreach (var (sateliteNumber, sateliteData) in epochData.satelitesData)
+                    {
 
-                    residuals[i] = sateliteData.pseudoranges["C1C"].value - (distance + dt * speedOfLight);
+                        double x_s = sateliteData.coordinates.X;
+                        double y_s = sateliteData.coordinates.Y;
+                        double z_s = sateliteData.coordinates.Z;
 
-                    A[i, 0] = (x - x_i) / distance;
-                    A[i, 1] = (y - y_i) / distance;
-                    A[i, 2] = (z - z_i) / distance;
-                    A[i, 3] = speedOfLight;
-                    i++;
-                }
+                        double distance = Math.Sqrt(Math.Pow(x - x_s, 2) + Math.Pow(y - y_s, 2) + Math.Pow(z - z_s, 2));
 
-                var A_matrix = DenseMatrix.OfArray(A);
-                var b_matrix = DenseVector.OfArray(residuals);
+                        Hs[lineNumber, 0] = (x - x_s) / distance;
+                        Hs[lineNumber, 1] = (y - y_s) / distance;
+                        Hs[lineNumber, 2] = (z - z_s) / distance;
+                        Hs[lineNumber, 3] = 1;
 
-                // Применение метода наименьших квадратов для нахождения корректировок
-                var coords = (A_matrix.Transpose() * A_matrix).Inverse() * A_matrix.Transpose() * b_matrix;
+                        // Вместо 0.0005 дописать clockBias
+                        Es[lineNumber] = sateliteData.pseudoranges["C1C"].value + speedOfLight * 0.0005 - distance - dt;
+                        lineNumber++;
+                    }
 
-                x = coords[0];
-                y = coords[1];
-                z = coords[2];
+                    var Hs_matrix = DenseMatrix.OfArray(Hs);
+                    var Es_matrix = DenseVector.OfArray(Es);
+                    var dOs = Hs_matrix.PseudoInverse() * Es_matrix;
+
+                    x += dOs[0];
+                    y += dOs[1];
+                    z += dOs[2];
+                    dt += dOs[3];
+                    iterationNumber++;
+                } while ((dx > tolerance || dy > tolerance || dz > tolerance || ddt > tolerance) && iterationNumber < maxIterations);
 
                 pointCoordinates.Add(new XYZCoordinates(x, y, z));
             }

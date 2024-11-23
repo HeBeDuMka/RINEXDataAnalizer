@@ -14,7 +14,6 @@ namespace RINEXDataAnaliser
             //ftpManager.ChangeWorkingDir("/htdocs/GNSS/SU52/2023/12");
             //List<string> fileList = ftpManager.GetFileList();
             //ftpManager.DownloadFile(fileList[2], "");
-
             RegexManager regexManager = new RegexManager();
             RINEXObsFile obsFile = new RINEXObsFile();
             obsFile.ParseFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\SU5200RUS_R_20233610000_01H_01S_MO.obs", regexManager);
@@ -24,6 +23,8 @@ namespace RINEXDataAnaliser
             glonassFile.parceFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3610.23g", regexManager);
             CoordFinder coordFinder = new CoordFinder();
             List<CalcEpoch> satsCoords = coordFinder.findSateliteCoord(obsFile, gpsFile, glonassFile, CalcOptions.GPS);
+
+
             List<XYZCoordinates> pointXYZCoords = coordFinder.findPointCoordinates(satsCoords);
 
             List<ELLCoordinates> pointELLCoords = new();

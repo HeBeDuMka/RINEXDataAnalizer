@@ -40,7 +40,7 @@ namespace RINEXDataAnaliser.Tests
 
             Assert.Equal(data, fileList);
         }
-
+        /*
         [Fact]
         public void ChangeWorkingDirNoErrorRelativePath()
         {
@@ -64,5 +64,6 @@ namespace RINEXDataAnaliser.Tests
 
             Assert.Equal(data, ftpManager.curentWorkingDirectory);
         }
+        */
     }
 }

@@ -42,6 +42,52 @@ namespace RINEXDataAnaliser
         private const double mu = 3.986005e14;
         private const double speedOfLight = 299792458.0;
         private const double omegaDotE = 7.2921151467e-5;
+
+        public static XYZCoordinates findGPSSateliteCoordinates(DateTime curentTime, double gpsWeek, double svHealth, double sqrtA,
+            double m0, double deltaN, double ecc, double omega, double cus, double cuc, double crs, double crc, double cis, double cic,
+            double i0, double iDot, double omega0, double omegaDot, double omegaDotE, double toe)
+        {
+            double A, tk, tSys, sysWeek, n0, n, Mk, Ek1, Ek2, nuK, Phi, deltaUk, deltaRk, deltaIk, uk, rk, ik, xko, yko, OmegaK, xk, yk, zk;
+
+            A = Math.Pow(sqrtA, 2);
+            n0 = Math.Sqrt(mu / Math.Pow(A, 3));
+            (sysWeek, tSys) = GNSSTime.getGPSTime(curentTime);
+            tk = ((sysWeek - gpsWeek) * GNSSTime.secondsPerWeek + tSys) - toe;
+
+            while (tk > GNSSTime.secondsPerWeek / 2)
+                tk -= GNSSTime.secondsPerWeek;
+            while (tk < -GNSSTime.secondsPerWeek / 2)
+                tk += GNSSTime.secondsPerWeek;
+
+            n = n0 + deltaN;
+            Mk = m0 + n * tk;
+            Ek1 = Mk;
+            Ek2 = Ek1;
+
+            do
+            {
+                Ek1 = Ek2;
+                Ek2 -= (Ek1 - ecc * Math.Sin(Ek1) - Mk) / (1 - ecc * Math.Cos(Ek1));
+            } while (Math.Abs(Ek1- Ek2) > 1e-13);
+
+            nuK = 2 * Math.Atan(Math.Sqrt((1 + ecc) / (1 - ecc)) * Math.Tan(Ek2 / 2));
+            Phi = nuK + omega;
+            deltaUk = cus * Math.Sin(2 * Phi) + cuc * Math.Cos(2 * Phi);
+            deltaRk = crs * Math.Sin(2 * Phi) + crc * Math.Cos(2 * Phi);
+            deltaIk = cis * Math.Sin(2 * Phi) + cic * Math.Cos(2 * Phi);
+            uk = Phi + deltaUk;
+            rk = A * (1 - ecc * Math.Cos(Ek2)) + deltaRk;
+            ik = i0 + deltaIk + iDot * tk;
+            xko = rk * Math.Cos(uk);
+            yko = rk * Math.Sin(uk);
+            OmegaK = omega0 + (omegaDot - omegaDotE) * tk - omegaDotE * toe;
+            xk = xko * Math.Cos(OmegaK) - yko * Math.Cos(ik) * Math.Sin(OmegaK);
+            yk = xko * Math.Sin(OmegaK) + yko * Math.Cos(ik) * Math.Cos(OmegaK);
+            zk = yko * Math.Sin(ik);
+
+            return new XYZCoordinates(xk, yk, zk);
+        }
+
         public List<CalcEpoch> findSateliteCoord(RINEXObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, CalcOptions calcOptions)
         {
             List<CalcEpoch> calcEpoches = new();
@@ -62,37 +108,11 @@ namespace RINEXDataAnaliser
 
                         if ((gpsEpoch != null) && (gpsEpoch.svHealth == 0))
                         {
-                            XYZCoordinates sateliteCoords = new();
+                            XYZCoordinates sateliteCoords = findGPSSateliteCoordinates(gpsEpoch.dateTime, gpsEpoch.gpsWeek, gpsEpoch.svAccuracy, gpsEpoch.sqrtA,
+                                gpsEpoch.m0, gpsEpoch.deltaN, gpsEpoch.e, gpsEpoch.omega, gpsEpoch.cus, gpsEpoch.cuc, gpsEpoch.crs,
+                                gpsEpoch.crc, gpsEpoch.cis, gpsEpoch.cic, gpsEpoch.i0, gpsEpoch.i0, gpsEpoch.omega0, gpsEpoch.omegaDot,
+                                omegaDotE, gpsEpoch.ttoe);
 
-                            double A = Math.Pow(gpsEpoch.sqrtA, 2);
-                            double tk = (gpsEpoch.dateTime - epochData.epochTime).TotalSeconds;
-                            double Mk = gpsEpoch.m0 + (Math.Sqrt(mu) / Math.Pow(gpsEpoch.sqrtA, 3) + gpsEpoch.deltaN) * tk;
-                            double Ek = 0.0;
-                            double E = Mk;
-
-                            while (Math.Abs(E - Ek) > 1e-13)
-                            {
-                                Ek = E;
-                                E -= (Ek - gpsEpoch.e * Math.Sin(Ek) - Mk) / (1 - gpsEpoch.e * Math.Cos(Ek));
-                            }
-
-                            double nuk = Math.Atan2(Math.Sqrt(1 - Math.Pow(gpsEpoch.e, 2)) * Math.Sin(Ek), Math.Cos(Ek) - gpsEpoch.e) + gpsEpoch.omega;
-                            double deltauk = gpsEpoch.cus * Math.Sin(2 * nuk) + gpsEpoch.cuc * Math.Cos(2 * nuk);
-                            double deltark = gpsEpoch.crs * Math.Sin(2 * nuk) + gpsEpoch.crc * Math.Cos(2 * nuk);
-                            double deltaik = gpsEpoch.cis * Math.Sin(2 * nuk) + gpsEpoch.cic * Math.Cos(2 * nuk);
-                            double uk = nuk + deltauk;
-                            double rk = A * (1 - gpsEpoch.e * Math.Cos(Ek)) + deltark;
-                            double ik = gpsEpoch.i0 + deltaik + gpsEpoch.iDot * tk;
-                            double xko = rk * Math.Cos(uk);
-                            double yko = rk * Math.Sin(uk);
-                            double Omegak = gpsEpoch.omega0 + (gpsEpoch.omegaDot - omegaDotE) * tk - omegaDotE * gpsEpoch.ttoe;
-                            double xk = xko * Math.Cos(Omegak) - yko * Math.Cos(ik) * Math.Sin(Omegak);
-                            double yk = xko * Math.Sin(Omegak) + yko * Math.Cos(ik) * Math.Cos(Omegak);
-                            double zk = yko * Math.Sin(ik);
-
-                            sateliteCoords.X = xk;
-                            sateliteCoords.Y = yk;
-                            sateliteCoords.Z = zk;
                             satData.coordinates = sateliteCoords;
                             satData.pseudoranges = sateliteData.pseudoranges;
                             satData.pseudophases = sateliteData.pseudophases;

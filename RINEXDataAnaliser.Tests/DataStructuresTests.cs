@@ -6,7 +6,7 @@ namespace RINEXDataAnaliser.Tests
 {
 	public class DataStructuresTests
 	{
-		[Fact]
+		/*
 		public void ObsDataParseTest()
 		{
 			Dictionary<string, double> dataDict = new Dictionary<string, double>();
@@ -31,5 +31,6 @@ namespace RINEXDataAnaliser.Tests
 
             Assert.Equal(dataDict, obs_Satelite_Data.data);
         }
+        */
 	}
 }

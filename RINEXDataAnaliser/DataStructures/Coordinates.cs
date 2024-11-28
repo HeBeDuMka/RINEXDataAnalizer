@@ -74,7 +74,7 @@ namespace RINEXDataAnaliser.DataStructures
 
             // Параметры для итерационного метода
             double p = Math.Sqrt(xyzCoordinates.X * xyzCoordinates.X + xyzCoordinates.Y * xyzCoordinates.Y);
-            double B = Math.Atan2(xyzCoordinates.Z, p * (1 - e2));
+            double B = Math.Atan2(xyzCoordinates.Z, p);
             double B_prev;
             double N;
 

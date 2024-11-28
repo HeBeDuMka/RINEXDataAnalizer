@@ -261,16 +261,33 @@ namespace RINEXDataAnaliser.DataStructures
 
         public RINEXNavGLONASSData findNeedEpoch(string sateliteNumber, DateTime needEpochTime)
         {
-            TimeSpan ephemStep = new TimeSpan(2, 0, 0);
-            for (int i = 0; i < data.Count; i++)
+            TimeSpan maxTimeDelta = new TimeSpan(0, 30, 0);
+            bool sateliteExist = false;
+            foreach (var epoh in data)
             {
-                if (sateliteNumber == data[i].sateliteNumber &&
-                    (needEpochTime - ephemStep) < data[i].epochTime)
+                if (sateliteNumber == epoh.sateliteNumber)
                 {
-                    return data[i];
+                    sateliteExist = true;
+                    if (needEpochTime >= epoh.epochTime &&
+                       (needEpochTime - epoh.epochTime) <= maxTimeDelta)
+                    {
+                        return epoh;
+                    }
                 }
             }
 
+            if (needEpochTime > data.Last().epochTime)
+            {
+                Console.WriteLine("Эфемериды слишком старые");
+            }
+            else if (sateliteExist == false)
+            {
+                Console.WriteLine("Спутник " + sateliteNumber + " отсутствует в списке");
+            }
+            else
+            {
+                Console.WriteLine("Эфемериды силшком новые");
+            }
             return null;
         }
 

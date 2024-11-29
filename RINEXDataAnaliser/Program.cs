@@ -23,8 +23,10 @@ namespace RINEXDataAnaliser
             RINEXNavGLONASSFile glonassFile = new();
             glonassFile.parceFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3600.23g", regexManager);
             glonassFile.parceFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3610.23g", regexManager);
+            RINEXNavGALILEOFile galileoFile = new();
+            galileoFile.ParseFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3610.23l", regexManager);
             CoordFinder coordFinder = new CoordFinder();
-            List<CalcEpoch> satsCoords = coordFinder.FindSateliteCoord(obsFile, gpsFile, glonassFile, CalcOptions.GLONASS);
+            List<CalcEpoch> satsCoords = coordFinder.FindSateliteCoord(obsFile, gpsFile, glonassFile, galileoFile, CalcOptions.GALILEO | CalcOptions.GLONASS | CalcOptions.GPS);
             List<XYZCoordinates> pointXYZCoords = coordFinder.findPointCoordinates(satsCoords);
 
             List<ELLCoordinates> pointELLCoords = new();

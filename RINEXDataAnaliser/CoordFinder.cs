@@ -48,9 +48,11 @@ namespace RINEXDataAnaliser
 
     public class CoordFinder
     {
-        private const double mu = 3.986005e14;
+        private const double mu_1 = 3.986005e14;
         private const double speedOfLight = 299792458.0;
         private const double omegaDotE = 7.2921151467e-5;
+
+        #region ГЛОНАСС
 
         /// <summary>
         /// Функция для расчета координат спутника ГЛОНАСС
@@ -100,7 +102,108 @@ namespace RINEXDataAnaliser
             return new XYZCoordinates(x, y, z);
         }
 
-        public List<CalcEpoch> FindSateliteCoord(RINEXObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, CalcOptions calcOptions)
+        /// <summary>
+        /// Функция для расчета движения спутника ГЛОНАСС
+        /// </summary>
+        /// <param name="x">Координата x спутника из эфемерид</param>
+        /// <param name="y">Координата y спутника из эфемерид</param>
+        /// <param name="z">Координата z спутника из эфемерид</param>
+        /// <param name="vx">Скорость спутника по оси x из эфемерид</param>
+        /// <param name="vy">Скорость спутника по оси y из эфемерид</param>
+        /// <param name="vz">Скороать спутника по оси z из эфемерид</param>
+        /// <param name="ax">Ускорение спутника по оси x из эфемерид</param>
+        /// <param name="ay">Ускорение спутника по оси y из эфемерид</param>
+        /// <param name="az">Ускорение спутника по оси z из эфемерид</param>
+        /// <returns></returns>
+        private (double, double, double, double, double, double) glonassSatelliteMotion(double x, double y, double z,
+            double vx, double vy, double vz, double ax, double ay, double az)
+        {
+            double mu = 3.9860044e14;
+            double ae = 6378136;
+            double J02 = 1082625.7e-9;
+            double OmegaEDot = 7.292115e-5;
+            double r = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2) + Math.Pow(z, 2));
+
+            double dx = vx;
+            double dy = vy;
+            double dz = vz;
+
+            double dvx = -mu / Math.Pow(r, 3) * x - 1.5 * Math.Pow(J02, 2) * (mu * Math.Pow(ae, 2)) / Math.Pow(r, 5) * x * (1 - 5 * Math.Pow(z, 2) / Math.Pow(r, 2)) + Math.Pow(OmegaEDot, 2) * x + 2 * OmegaEDot * vy + ax;
+            double dvy = -mu / Math.Pow(r, 3) * y - 1.5 * Math.Pow(J02, 2) * (mu * Math.Pow(ae, 2)) / Math.Pow(r, 5) * y * (1 - 5 * Math.Pow(z, 2) / Math.Pow(r, 2)) + Math.Pow(OmegaEDot, 2) * y + 2 * OmegaEDot * vx + ay;
+            double dvz = -mu / Math.Pow(r, 3) * z - 1.5 * Math.Pow(J02, 2) * (mu * Math.Pow(ae, 2)) / Math.Pow(r, 5) * z * (1 - 5 * Math.Pow(z, 2) / Math.Pow(r, 2)) + az;
+
+            return (dx, dy, dz, dvx, dvy, dvz);
+        }
+
+        #endregion
+
+        #region GALILEO
+
+        /// <summary>
+        /// Функция для расчета координат спутника GALILEO
+        /// </summary>
+        /// <param name="sqrtA">Корень из длины большей полуоси орбиты</param>
+        /// <param name="deltaN">Разница среднего движения от вычисленного значения</param>
+        /// <param name="M0">Средняя аномалия в момент излучения</param>
+        /// <param name="ecc">Эксцентриситет</param>
+        /// <param name="omega">Аргумент перигея</param>
+        /// <param name="cus">Амплитуда косинусного поправочного члена к аргументу широты</param>
+        /// <param name="cuc">Амплитуда синусного поправочного члена к аргументу широты</param>
+        /// <param name="crs">Амплитуда косинусного поправочного члена к радиусу орбиты</param>
+        /// <param name="crc">Амплитуда синусного поправочного члена к радиусу орбиты</param>
+        /// <param name="cis">Амплитуда косинусного поправочного члена к углу наклонения</param>
+        /// <param name="cic">Амплитуда синусного поправочного члена к углу наклонения</param>
+        /// <param name="i0">Угол наклонения в момент излучения</param>
+        /// <param name="iDot">Скорость изменения угла наклонения</param>
+        /// <param name="Omega0">Долгота восходящего узла орбитальной плоскости в недельную эпоху</param>
+        /// <param name="omegaDot">Скорость изменения угла прямого восхождения</param>
+        /// <param name="t0e">Время эфемерид в момент излучения</param>
+        /// <param name="tk">Время применика в момент прешествия (в формате времени недели GALILEO)</param>
+        /// <returns></returns>
+        public static XYZCoordinates CalcGALILEOsateliteCoordinates(double sqrtA, double deltaN, double M0, double ecc, double omega,
+            double cus, double cuc, double crs, double crc, double cis, double cic, double i0, double iDot, double Omega0,
+            double omegaDot, double t0e, double tk)
+        {
+            double A, n0, n, M, Ek1, Ek2, sinnu, cosnu, nu, phi, du, dr, di, u, r, i, xo, yo, Omega, x, y, z;
+            double mu = 3.986004418;
+            double omegaE = 7.2921151467e-5;
+
+            A = Math.Pow(sqrtA, 2);
+            n0 = Math.Sqrt(mu / Math.Pow(A, 3));
+            n = n0 + deltaN;
+            M = M0 + n * tk;
+            Ek1 = 0.0;
+            Ek2 = M;
+
+            while (Math.Abs(Ek1 - Ek2) > 1e-13)
+            {
+                Ek1 = Ek2;
+                Ek2 -= (Ek1 - ecc * Math.Sin(Ek1) - M) / (1 - ecc * Math.Cos(Ek1));
+            }
+
+            sinnu = (Math.Sqrt(1 - Math.Pow(ecc, 2)) * Math.Sin(Ek2)) / (1 - ecc * Math.Cos(Ek2));
+            cosnu = (Math.Cos(Ek2) - ecc) / (1 - ecc * Math.Cos(Ek2));
+            nu = Math.Atan2(sinnu, cosnu);
+            phi = nu + omega;
+            du = cus * Math.Sin(2 * phi) + cuc * Math.Cos(2 * phi);
+            dr = crs * Math.Sin(2 * phi) + crc * Math.Cos(2 * phi);
+            di = cis * Math.Sin(2 * phi) + cic * Math.Cos(2 * phi);
+            u = phi + du;
+            r = A * (1 - ecc * Math.Cos(Ek2)) + dr;
+            i = i0 + di + iDot * tk;
+            xo = r * Math.Cos(u);
+            yo = r * Math.Sin(u);
+            Omega = Omega0 + (omegaDot - omegaE) * tk - omegaE * t0e;
+            x = xo * Math.Cos(Omega) - yo * Math.Sin(Omega) * Math.Cos(i);
+            y = xo * Math.Sin(Omega) + yo * Math.Cos(Omega) * Math.Cos(i);
+            z = yo * Math.Sin(i);
+
+            return new XYZCoordinates(x ,y, z);
+        }
+
+        #endregion
+
+        public List<CalcEpoch> FindSateliteCoord(RINEXObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, RINEXNavGALILEOFile navGALILEOFile, CalcOptions calcOptions)
         {
             List<CalcEpoch> calcEpoches = new();
             CalcEpoch calcEpoch;
@@ -124,7 +227,7 @@ namespace RINEXDataAnaliser
 
                             double A = Math.Pow(gpsEpoch.sqrtA, 2);
                             double tk = (epochData.epochTime - gpsEpoch.dateTime).TotalSeconds + 18 - (sateliteData.pseudoranges["C1C"].value / speedOfLight); // <- Косяк тут
-                            double Mk = gpsEpoch.m0 + (Math.Sqrt(mu) / Math.Pow(gpsEpoch.sqrtA, 3) + gpsEpoch.deltaN) * tk;
+                            double Mk = gpsEpoch.m0 + (Math.Sqrt(mu_1) / Math.Pow(gpsEpoch.sqrtA, 3) + gpsEpoch.deltaN) * tk;
                             double Ek = 0.0;
                             double E = Mk;
 
@@ -180,6 +283,29 @@ namespace RINEXDataAnaliser
 
                             satData.pseudoranges = sateliteData.pseudoranges;
                             satData.pseudophases = sateliteData.pseudophases;
+                            satData.deltaSysTime = gloEpoch.clockBias;
+                            satelitesData.Add(sateliteNumber, satData);
+                        }
+                    }
+                    else if (sateliteNumber.StartsWith("E") && ((calcOptions & CalcOptions.GALILEO) == CalcOptions.GALILEO))
+                    {
+                        RINEXNavGALILEOData galEpoch = navGALILEOFile.findNeedEpoch(sateliteNumber, epochData.epochTime);
+
+                        if (galEpoch != null)
+                        {
+                            double obsWeekNumber, tow, toe, tsv, tk;
+                            (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GALILEO, epochData.epochTime);
+                            toe = galEpoch.ttoe;
+                            tk = ((obsWeekNumber - galEpoch.galWeek) * 604800 + tow) - toe;
+                            tsv = tk - sateliteData.pseudoranges["C1C"].value / speedOfLight;
+
+                            satData.coordinates = CalcGALILEOsateliteCoordinates(galEpoch.sqrtA, galEpoch.deltaN, galEpoch.m0, galEpoch.e,
+                                galEpoch.omega, galEpoch.cus, galEpoch.cuc, galEpoch.crs, galEpoch.crc, galEpoch.cis, galEpoch.cic,
+                                galEpoch.i0, galEpoch.iDot, galEpoch.omega0, galEpoch.omegaDot, galEpoch.ttoe, tk);
+
+                            satData.pseudoranges = sateliteData.pseudoranges;
+                            satData.pseudophases = sateliteData.pseudophases;
+                            satData.deltaSysTime = galEpoch.clockBias;
                             satelitesData.Add(sateliteNumber, satData);
                         }
                     }
@@ -192,40 +318,7 @@ namespace RINEXDataAnaliser
             return calcEpoches;
         }
 
-        /// <summary>
-        /// Функция для расчета движения спутника ГЛОНАСС
-        /// </summary>
-        /// <param name="x">Координата x спутника из эфемерид</param>
-        /// <param name="y">Координата y спутника из эфемерид</param>
-        /// <param name="z">Координата z спутника из эфемерид</param>
-        /// <param name="vx">Скорость спутника по оси x из эфемерид</param>
-        /// <param name="vy">Скорость спутника по оси y из эфемерид</param>
-        /// <param name="vz">Скороать спутника по оси z из эфемерид</param>
-        /// <param name="ax">Ускорение спутника по оси x из эфемерид</param>
-        /// <param name="ay">Ускорение спутника по оси y из эфемерид</param>
-        /// <param name="az">Ускорение спутника по оси z из эфемерид</param>
-        /// <returns></returns>
-        private (double, double, double, double, double, double) glonassSatelliteMotion(double x, double y, double z,
-            double vx, double vy, double vz, double ax, double ay, double az)
-        {
-            double mu = 3.9860044e14;
-            double ae = 6378136;
-            double J02 = 1082625.7e-9;
-            double OmegaEDot = 7.292115e-5;
-            double r = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2) + Math.Pow(z, 2));
-
-            double dx = vx;
-            double dy = vy;
-            double dz = vz;
-
-            double dvx = -mu / Math.Pow(r, 3) * x - 1.5 * Math.Pow(J02, 2) * (mu * Math.Pow(ae, 2)) / Math.Pow(r, 5) * x * (1 - 5 * Math.Pow(z, 2) / Math.Pow(r, 2)) + Math.Pow(OmegaEDot, 2) * x + 2 * OmegaEDot * vy + ax;
-            double dvy = -mu / Math.Pow(r, 3) * y - 1.5 * Math.Pow(J02, 2) * (mu * Math.Pow(ae, 2)) / Math.Pow(r, 5) * y * (1 - 5 * Math.Pow(z, 2) / Math.Pow(r, 2)) + Math.Pow(OmegaEDot, 2) * y + 2 * OmegaEDot * vx + ay;
-            double dvz = -mu / Math.Pow(r, 3) * z - 1.5 * Math.Pow(J02, 2) * (mu * Math.Pow(ae, 2)) / Math.Pow(r, 5) * z * (1 - 5 * Math.Pow(z, 2) / Math.Pow(r, 2)) + az;
-
-            return (dx, dy, dz, dvx, dvy, dvz);
-        }
-
-        public List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, double tolerance = 1e-12, int maxIterations = 1000)
+        public List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, double tolerance = 1e-12, int maxIterations = 100)
         {
             List<XYZCoordinates> pointCoordinates = new();
 

@@ -30,6 +30,8 @@ namespace RINEXDataAnaliser
 
         public Dictionary<string, Regex> gloNavEpohs = new();
 
+        public Dictionary<string, Regex> galNavEpohs = new();
+
         public RegexManager()
         {
             obsHeader.Add("RINEX VERSION / TYPE", new Regex(@"\s+(?<Rinex_version>\d{1}\.\d{2})\s+(?<Rinex_type>\w+\s\w+)\s+(?<Satelite_system>\w)\s+", RegexOptions.Compiled));
@@ -63,6 +65,15 @@ namespace RINEXDataAnaliser
             gloNavEpohs.Add("BROADCAST ORBIT - 1", new Regex(@"\s{4}(?<SatelitePosX>[0-9\.\-\D]{19})(?<VelocityX>[0-9\.\-\D]{19})(?<AccelerationX>[0-9\.\-\D]{19})(?<Health>[0-9\.\-\D]{19})", RegexOptions.Compiled));
             gloNavEpohs.Add("BROADCAST ORBIT - 2", new Regex(@"\s{4}(?<SatelitePosY>[0-9\.\-\D]{19})(?<VelocityY>[0-9\.\-\D]{19})(?<AccelerationY>[0-9\.\-\D]{19})(?<FrequencyNumber>[0-9\.\-\D]{19})", RegexOptions.Compiled));
             gloNavEpohs.Add("BROADCAST ORBIT - 3", new Regex(@"\s{4}(?<SatelitePosZ>[0-9\.\-\D]{19})(?<VelocityZ>[0-9\.\-\D]{19})(?<AccelerationZ>[0-9\.\-\D]{19})(?<AgeOfOperInfo>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+
+            galNavEpohs.Add("SV / EPOCH / SV CLK", new Regex(@"(?<SateliteNumber>\w{3})\s(?<Year>\d{4})\s(?<Month>\d{2})\s(?<Day>\d{2})\s+(?<Hour>\d{1,2})\s+(?<Minute>\d{1,2})\s+(?<Second>\d{1,2})(?<ClockBias>[0-9\.\-\D]{19})(?<ClockDrift>[0-9\.\-\D]{19})(?<ClockDriftRate>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            galNavEpohs.Add("BROADCAST ORBIT - 1", new Regex(@"\s{4}(?<IODE>[0-9\.\-\D]{19})(?<Crs>[0-9\.\-\D]{19})(?<DeltaN>[0-9\.\-\D]{19})(?<M0>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            galNavEpohs.Add("BROADCAST ORBIT - 2", new Regex(@"\s{4}(?<Cuc>[0-9\.\-\D]{19})(?<E>[0-9\.\-\D]{19})(?<Cus>[0-9\.\-\D]{19})(?<SqrtA>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            galNavEpohs.Add("BROADCAST ORBIT - 3", new Regex(@"\s{4}(?<TTOE>[0-9\.\-\D]{19})(?<Cic>[0-9\.\-\D]{19})(?<Omega0>[0-9\.\-\D]{19})(?<Cis>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            galNavEpohs.Add("BROADCAST ORBIT - 4", new Regex(@"\s{4}(?<I0>[0-9\.\-\D]{19})(?<Crc>[0-9\.\-\D]{19})(?<Omega>[0-9\.\-\D]{19})(?<OmegaDot>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            galNavEpohs.Add("BROADCAST ORBIT - 5", new Regex(@"\s{4}(?<IDot>[0-9\.\-\D]{19})(?<DataSources>[0-9\.\-\D]{19})(?<GalWeek>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            galNavEpohs.Add("BROADCAST ORBIT - 6", new Regex(@"\s{4}(?<SISA>[0-9\.\-\D]{19})(?<SVHealth>[0-9\.\-\D]{19})(?<BGDE5a_E1>[0-9\.\-\D]{19})(?<BGDE5b_E1>[0-9\.\-\D]{19})", RegexOptions.Compiled));
+            galNavEpohs.Add("BROADCAST ORBIT - 7", new Regex(@"\s{4}(?<TransmitionTimeOfMessage>[0-9\.\-\D]{19})", RegexOptions.Compiled));
         }
     }
 }

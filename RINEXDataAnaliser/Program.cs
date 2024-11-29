@@ -26,7 +26,7 @@ namespace RINEXDataAnaliser
             RINEXNavGALILEOFile galileoFile = new();
             galileoFile.ParseFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3610.23l", regexManager);
             CoordFinder coordFinder = new CoordFinder();
-            List<CalcEpoch> satsCoords = coordFinder.FindSateliteCoord(obsFile, gpsFile, glonassFile, galileoFile, CalcOptions.GALILEO | CalcOptions.GLONASS | CalcOptions.GPS);
+            List<CalcEpoch> satsCoords = coordFinder.FindSateliteCoord(obsFile, gpsFile, glonassFile, galileoFile, CalcOptions.GPS);
             List<XYZCoordinates> pointXYZCoords = coordFinder.findPointCoordinates(satsCoords);
 
             List<ELLCoordinates> pointELLCoords = new();
@@ -36,6 +36,7 @@ namespace RINEXDataAnaliser
                 ellCoordinates.fromXYZ(coords);
                 pointELLCoords.Add(ellCoordinates);
             }
+            PlotGenerator.PlotEllCoords(pointELLCoords, "onlyGps");
 
             return 0;
         }

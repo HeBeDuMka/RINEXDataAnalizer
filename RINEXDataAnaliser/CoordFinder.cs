@@ -326,17 +326,21 @@ namespace RINEXDataAnaliser
             {
                 // Начальные приближения координат и смещение часов приемника относительно часов системы (в метрах)
                 double x = 0, y = 0, z = 0, dt = 0;
-                double dx = 0, dy = 0, dz = 0, ddt = 0;
+                double dx, dy, dz, ddt;
                 int iterationNumber = 0;
+                CalcEpoch curentEpoh = epochData;
+                bool earthSpeedTaked = false;
+
+            start:
 
                 do
                 {
-                    int satelitesCount = epochData.satelitesData.Count;
+                    int satelitesCount = curentEpoh.satelitesData.Count;
                     double[,] Hs = new double[satelitesCount, 4];
                     double[] Es = new double[satelitesCount];
                     int lineNumber = 0;
 
-                    foreach (var (sateliteNumber, sateliteData) in epochData.satelitesData)
+                    foreach (var (sateliteNumber, sateliteData) in curentEpoh.satelitesData)
                     {
 
                         double x_s = sateliteData.coordinates.X;
@@ -370,6 +374,26 @@ namespace RINEXDataAnaliser
                     dt += dOs[3];
                     iterationNumber++;
                 } while ((Math.Abs(dx) > tolerance || Math.Abs(dy) > tolerance || Math.Abs(dz) > tolerance || Math.Abs(ddt) > tolerance) && iterationNumber < maxIterations);
+
+                if (!earthSpeedTaked)
+                {
+                    foreach (var (sateliteNumber, sateliteData) in curentEpoh.satelitesData)
+                    {
+                        double x_s = sateliteData.coordinates.X;
+                        double y_s = sateliteData.coordinates.Y;
+                        double z_s = sateliteData.coordinates.Z;
+
+                        double distance = Math.Sqrt(Math.Pow(x - x_s, 2) + Math.Pow(y - y_s, 2) + Math.Pow(z - z_s, 2));
+
+                        double alphaJ = omegaDotE * distance / speedOfLight;
+                        sateliteData.coordinates.X = x_s + y_s * alphaJ;
+                        sateliteData.coordinates.Y = y_s - x_s * alphaJ;
+                        sateliteData.coordinates.Z = z_s;
+
+                        earthSpeedTaked = true;
+                    }
+                    goto start;
+                }
 
                 pointCoordinates.Add(new XYZCoordinates(x, y, z));
             }

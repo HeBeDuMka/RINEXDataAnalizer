@@ -165,7 +165,7 @@ namespace RINEXDataAnaliser
             double omegaDot, double t0e, double tk)
         {
             double A, n0, n, M, Ek1, Ek2, sinnu, cosnu, nu, phi, du, dr, di, u, r, i, xo, yo, Omega, x, y, z;
-            double mu = 3.986004418;
+            double mu = 3.986004418e14;
             double omegaE = 7.2921151467e-5;
 
             A = Math.Pow(sqrtA, 2);
@@ -223,38 +223,17 @@ namespace RINEXDataAnaliser
 
                         if ((gpsEpoch != null) && (gpsEpoch.svHealth == 0))
                         {
-                            XYZCoordinates sateliteCoords = new();
+                            double obsWeekNumber, tow, toe, toc, dtsv, tsv, tk;
+                            double af0 = gpsEpoch.clockBias, af1 = gpsEpoch.clockDrift, af2 = gpsEpoch.clockDriftRate;
+                            (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, epochData.epochTime);
+                            (_, toc) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, gpsEpoch.dateTime);
+                            toe = gpsEpoch.ttoe;
+                            tk = ((obsWeekNumber - gpsEpoch.gpsWeek) * 604800 + tow) - toe;
+                            dtsv = af0 + af1 * (tk - toc) + af2 * Math.Pow(tk - toc, 2);
 
-                            double A = Math.Pow(gpsEpoch.sqrtA, 2);
-                            double tk = (epochData.epochTime - gpsEpoch.dateTime).TotalSeconds + 18 - (sateliteData.pseudoranges["C1C"].value / speedOfLight); // <- Косяк тут
-                            double Mk = gpsEpoch.m0 + (Math.Sqrt(mu_1) / Math.Pow(gpsEpoch.sqrtA, 3) + gpsEpoch.deltaN) * tk;
-                            double Ek = 0.0;
-                            double E = Mk;
-
-                            while (Math.Abs(E - Ek) > 1e-13)
-                            {
-                                Ek = E;
-                                E -= (Ek - gpsEpoch.e * Math.Sin(Ek) - Mk) / (1 - gpsEpoch.e * Math.Cos(Ek));
-                            }
-
-                            double nuk = Math.Atan2(Math.Sqrt(1 - Math.Pow(gpsEpoch.e, 2)) * Math.Sin(Ek), Math.Cos(Ek) - gpsEpoch.e) + gpsEpoch.omega;
-                            double deltauk = gpsEpoch.cus * Math.Sin(2 * nuk) + gpsEpoch.cuc * Math.Cos(2 * nuk);
-                            double deltark = gpsEpoch.crs * Math.Sin(2 * nuk) + gpsEpoch.crc * Math.Cos(2 * nuk);
-                            double deltaik = gpsEpoch.cis * Math.Sin(2 * nuk) + gpsEpoch.cic * Math.Cos(2 * nuk);
-                            double uk = nuk + deltauk;
-                            double rk = A * (1 - gpsEpoch.e * Math.Cos(Ek)) + deltark;
-                            double ik = gpsEpoch.i0 + deltaik + gpsEpoch.iDot * tk;
-                            double xko = rk * Math.Cos(uk);
-                            double yko = rk * Math.Sin(uk);
-                            double Omegak = gpsEpoch.omega0 + (gpsEpoch.omegaDot - omegaDotE) * tk - omegaDotE * gpsEpoch.ttoe;
-                            double xk = xko * Math.Cos(Omegak) - yko * Math.Cos(ik) * Math.Sin(Omegak);
-                            double yk = xko * Math.Sin(Omegak) + yko * Math.Cos(ik) * Math.Cos(Omegak);
-                            double zk = yko * Math.Sin(ik);
-
-                            sateliteCoords.X = xk;
-                            sateliteCoords.Y = yk;
-                            sateliteCoords.Z = zk;
-                            satData.coordinates = sateliteCoords;
+                            satData.coordinates = CalcGALILEOsateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
+                                gpsEpoch.omega, gpsEpoch.cus, gpsEpoch.cuc, gpsEpoch.crs, gpsEpoch.crc, gpsEpoch.cis, gpsEpoch.cic,
+                                gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, tk);
                             satData.pseudoranges = sateliteData.pseudoranges;
                             satData.pseudophases = sateliteData.pseudophases;
                             satData.deltaSysTime = gpsEpoch.clockBias;

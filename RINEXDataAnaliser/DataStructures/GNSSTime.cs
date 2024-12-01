@@ -14,7 +14,7 @@ namespace RINEXDataAnaliser.DataStructures
             switch (system)
             {
                 case GNSSSystem.GPS:
-                    return new DateTime(1970, 1, 1, 0, 0, 18);
+                    return new DateTime(1980, 1, 5, 23, 59, 42);
                 case GNSSSystem.GLONASS:
                     return new DateTime(1980, 1, 5, 23, 59, 42);
                 case GNSSSystem.BDS:

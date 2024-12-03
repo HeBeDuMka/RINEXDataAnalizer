@@ -10,6 +10,7 @@ namespace RINEXDataAnaliser
         {
             Console.OutputEncoding = Encoding.UTF8;
             string workingDir = @"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\";
+            Logger.OpenLogFile(Path.Combine(workingDir, $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.txt"));
 
             //FTPManager ftpManager = new FTPManager("ftp://ftpupload.net", "b7_33706431", "logitech");
             //ftpManager.ChangeWorkingDir("/htdocs/GNSS/SU52/2023/12");
@@ -38,7 +39,7 @@ namespace RINEXDataAnaliser
                 pointELLCoords.Add(ellCoordinates);
             }
             PlotGenerator.PlotEllCoords(pointELLCoords, "onlyGps");
-
+            Logger.CloseLogFile();
             return 0;
         }
     }

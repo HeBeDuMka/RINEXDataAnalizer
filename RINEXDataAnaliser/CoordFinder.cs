@@ -213,6 +213,7 @@ namespace RINEXDataAnaliser
             {
                 calcEpoch = new();
                 Dictionary<string, SatData> satelitesData = new();
+                Logger.WriteLineToLog($"Расчет координат спутников для времени {epochData.epochTime:yyyy-MM-dd-HH-mm-ss}\n");
 
                 foreach (var (sateliteNumber, sateliteData) in epochData.satelitesData)
                 {
@@ -224,6 +225,7 @@ namespace RINEXDataAnaliser
 
                         if ((gpsEpoch != null) && (gpsEpoch.svHealth == 0))
                         {
+                            Logger.WriteLineToLog($"Для спутника {sateliteNumber} выбрана эпоха за {gpsEpoch.dateTime:yyyy-MM-dd-HH-mm-ss}");
                             double obsWeekNumber, tow, toe, toc, dtsv, tsv, tk;
                             double af0 = gpsEpoch.clockBias, af1 = gpsEpoch.clockDrift, af2 = gpsEpoch.clockDriftRate;
                             (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, epochData.epochTime);
@@ -232,15 +234,30 @@ namespace RINEXDataAnaliser
                             tk = ((obsWeekNumber - gpsEpoch.gpsWeek) * 604800 + tow) - toe;
                             dtsv = af0 + af1 * (tk - toc) + af2 * Math.Pow(tk - toc, 2);
                             tsv = tk - dtsv;
+                            Logger.WriteLineToLog($"Время для спутника {sateliteNumber}: {tsv}");
 
                             satData.coordinates = CalcGALILEOsateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
                                 gpsEpoch.omega, gpsEpoch.cus, gpsEpoch.cuc, gpsEpoch.crs, gpsEpoch.crc, gpsEpoch.cis, gpsEpoch.cic,
                                 gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, tsv);
+                            Logger.WriteLineToLog($"Параметры эфемерид спутника {sateliteNumber}: sqrtA={gpsEpoch.sqrtA}, deltaN={gpsEpoch.deltaN},\n" +
+                                $"m0={gpsEpoch.m0}, ecc={gpsEpoch.e}, omega={gpsEpoch.omega}, cus={gpsEpoch.cus},\n" +
+                                $"cuc={gpsEpoch.cuc}, crs={gpsEpoch.crs}, crc={gpsEpoch.crc}, cis={gpsEpoch.cis}, cic={gpsEpoch.cic},\n" +
+                                $"i0={gpsEpoch.i0}, idot={gpsEpoch.iDot}, Omega0={gpsEpoch.omega0}, OmegaDot={gpsEpoch.omegaDot},\n" +
+                                $"toe={gpsEpoch.ttoe}, af0={gpsEpoch.clockBias}, af1={gpsEpoch.clockDrift}, af2={gpsEpoch.clockDriftRate}");
+                            Logger.WriteLineToLog($"Координаты спутника {sateliteNumber}: x={satData.coordinates.X}, y={satData.coordinates.Y}, z={satData.coordinates.Z}");
+                            
                             satData.pseudoranges = sateliteData.pseudoranges;
                             satData.pseudophases = sateliteData.pseudophases;
                             satData.deltaSysTime = dtsv;
+                            Logger.WriteLineToLog($"Псевдодальность до спутника {sateliteNumber}: p={satData.pseudoranges["C1C"].value}");
+
                             satelitesData.Add(sateliteNumber, satData);
                         }
+                        else
+                        {
+                            Logger.WriteLineToLog($"Спутник {sateliteNumber} пропущен");
+                        }
+                        Logger.WriteLineToLog("");
                     }
                     else if (sateliteNumber.StartsWith("R") && ((calcOptions & CalcOptions.GLONASS) == CalcOptions.GLONASS))
                     {
@@ -295,6 +312,8 @@ namespace RINEXDataAnaliser
                 calcEpoch.satelitesData = satelitesData;
                 calcEpoch.epochDate = epochData.epochTime;
                 calcEpoches.Add(calcEpoch);
+
+                Logger.WriteLineToLog($"------------------------------------------------------------------------------\n");
             }
             return calcEpoches;
         }
@@ -302,9 +321,11 @@ namespace RINEXDataAnaliser
         public static List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, double tolerance = 1, int maxIterations = 100)
         {
             List<XYZCoordinates> pointCoordinates = new();
+            Logger.WriteLineToLog($"\n\nНачат расчет координат");
 
             foreach (var epochData in epochsData)
             {
+                Logger.WriteLineToLog($"\nРасчет эпохи {epochData.epochDate:yyyy-MM-dd-HH-mm-ss}");
                 // Начальные приближения координат и смещение часов приемника относительно часов системы (в метрах)
                 double x = 0, y = 0, z = 0, dt = 0;
                 double dx, dy, dz, ddt;
@@ -354,10 +375,12 @@ namespace RINEXDataAnaliser
                     z += dOs[2];
                     dt += dOs[3];
                     iterationNumber++;
+                    Logger.WriteLineToLog($"Поправки для координат на {iterationNumber} итерации: dx={dx}, dy={dy}, dz={dz}, ddt={ddt}");
                 } while ((Math.Abs(dx) > tolerance || Math.Abs(dy) > tolerance || Math.Abs(dz) > tolerance || Math.Abs(ddt) > tolerance) && iterationNumber < maxIterations);
 
                 if (!earthSpeedTaked)
                 {
+                    Logger.WriteLineToLog($"Учет вращения Земли");
                     foreach (var (sateliteNumber, sateliteData) in curentEpoh.satelitesData)
                     {
                         double x_s = sateliteData.coordinates.X;
@@ -373,9 +396,11 @@ namespace RINEXDataAnaliser
 
                         earthSpeedTaked = true;
                     }
+
+                    Logger.WriteLineToLog($"Перерасчет координат приемника");
                     goto start;
                 }
-
+                Logger.WriteLineToLog($"Итоговые координаты приемника: x={x}, y={y}, z={z}");
                 pointCoordinates.Add(new XYZCoordinates(x, y, z));
             }
 

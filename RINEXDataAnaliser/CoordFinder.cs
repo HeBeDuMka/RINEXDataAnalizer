@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra.Solvers;
 using MathNet.Numerics.LinearAlgebra.Double;
+using System.Runtime.Serialization.Formatters;
 
 namespace RINEXDataAnaliser
 {
@@ -68,7 +69,7 @@ namespace RINEXDataAnaliser
         /// <param name="_az">Ускорение спутника по оси z из эфемерид</param>
         /// <param name="dt"></param>
         /// <returns></returns>
-        public XYZCoordinates CalcGLONASSSateliteCoordinates(double _x, double _y, double _z, double _vx, double _vy, double _vz, double _ax, double _ay, double _az, double dt)
+        public static XYZCoordinates CalcGLONASSSateliteCoordinates(double _x, double _y, double _z, double _vx, double _vy, double _vz, double _ax, double _ay, double _az, double dt)
         {
             double x, y, z, vx, vy, vz, ax, ay, az;
 
@@ -115,7 +116,7 @@ namespace RINEXDataAnaliser
         /// <param name="ay">Ускорение спутника по оси y из эфемерид</param>
         /// <param name="az">Ускорение спутника по оси z из эфемерид</param>
         /// <returns></returns>
-        private (double, double, double, double, double, double) glonassSatelliteMotion(double x, double y, double z,
+        private static (double, double, double, double, double, double) glonassSatelliteMotion(double x, double y, double z,
             double vx, double vy, double vz, double ax, double ay, double az)
         {
             double mu = 3.9860044e14;
@@ -165,7 +166,7 @@ namespace RINEXDataAnaliser
             double omegaDot, double t0e, double tk)
         {
             double A, n0, n, M, Ek1, Ek2, sinnu, cosnu, nu, phi, du, dr, di, u, r, i, xo, yo, Omega, x, y, z;
-            double mu = 3.986004418e14;
+            double mu = 3.986005e14;
             double omegaE = 7.2921151467e-5;
 
             A = Math.Pow(sqrtA, 2);
@@ -175,7 +176,7 @@ namespace RINEXDataAnaliser
             Ek1 = 0.0;
             Ek2 = M;
 
-            while (Math.Abs(Ek1 - Ek2) > 1e-13)
+            while (Math.Abs(Ek1 - Ek2) > 1e-9)
             {
                 Ek1 = Ek2;
                 Ek2 -= (Ek1 - ecc * Math.Sin(Ek1) - M) / (1 - ecc * Math.Cos(Ek1));
@@ -203,7 +204,7 @@ namespace RINEXDataAnaliser
 
         #endregion
 
-        public List<CalcEpoch> FindSateliteCoord(RINEXObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, RINEXNavGALILEOFile navGALILEOFile, CalcOptions calcOptions)
+        public static List<CalcEpoch> FindSateliteCoord(RINEXObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, RINEXNavGALILEOFile navGALILEOFile, CalcOptions calcOptions)
         {
             List<CalcEpoch> calcEpoches = new();
             CalcEpoch calcEpoch;
@@ -230,13 +231,14 @@ namespace RINEXDataAnaliser
                             toe = gpsEpoch.ttoe;
                             tk = ((obsWeekNumber - gpsEpoch.gpsWeek) * 604800 + tow) - toe;
                             dtsv = af0 + af1 * (tk - toc) + af2 * Math.Pow(tk - toc, 2);
+                            tsv = tk - dtsv;
 
                             satData.coordinates = CalcGALILEOsateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
                                 gpsEpoch.omega, gpsEpoch.cus, gpsEpoch.cuc, gpsEpoch.crs, gpsEpoch.crc, gpsEpoch.cis, gpsEpoch.cic,
-                                gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, tk);
+                                gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, tsv);
                             satData.pseudoranges = sateliteData.pseudoranges;
                             satData.pseudophases = sateliteData.pseudophases;
-                            satData.deltaSysTime = gpsEpoch.clockBias;
+                            satData.deltaSysTime = dtsv;
                             satelitesData.Add(sateliteNumber, satData);
                         }
                     }
@@ -297,7 +299,7 @@ namespace RINEXDataAnaliser
             return calcEpoches;
         }
 
-        public List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, double tolerance = 1e-12, int maxIterations = 100)
+        public static List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, double tolerance = 1e-8, int maxIterations = 100)
         {
             List<XYZCoordinates> pointCoordinates = new();
 

@@ -9,6 +9,7 @@ namespace RINEXDataAnaliser
         static int Main()
         {
             Console.OutputEncoding = Encoding.UTF8;
+            string workingDir = @"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\";
 
             //FTPManager ftpManager = new FTPManager("ftp://ftpupload.net", "b7_33706431", "logitech");
             //ftpManager.ChangeWorkingDir("/htdocs/GNSS/SU52/2023/12");
@@ -17,14 +18,14 @@ namespace RINEXDataAnaliser
 
             RegexManager regexManager = new RegexManager();
             RINEXObsFile obsFile = new RINEXObsFile();
-            obsFile.ParseFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\SU5200RUS_R_20233610000_01H_01S_MO.obs", regexManager);
+            obsFile.ParseFile(workingDir + @"SU5200RUS_R_20233610000_01H_01S_MO.obs", regexManager);
             RINEXNavGPSFile gpsFile = new();
-            gpsFile.ParceFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3610.23n", regexManager);
+            gpsFile.ParceFile(workingDir + @"Brdc3610.23n", regexManager);
             RINEXNavGLONASSFile glonassFile = new();
-            glonassFile.parceFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3600.23g", regexManager);
-            glonassFile.parceFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3610.23g", regexManager);
+            glonassFile.parceFile(workingDir + @"Brdc3600.23g", regexManager);
+            glonassFile.parceFile(workingDir + @"Brdc3610.23g", regexManager);
             RINEXNavGALILEOFile galileoFile = new();
-            galileoFile.ParseFile(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\Brdc3610.23l", regexManager);
+            galileoFile.ParseFile(workingDir + @"Brdc3610.23l", regexManager);
             List<CalcEpoch> satsCoords = CoordFinder.FindSateliteCoord(obsFile, gpsFile, glonassFile, galileoFile, CalcOptions.GPS);
             PlotGenerator.PlotSatsTrack(satsCoords);
             List<XYZCoordinates> pointXYZCoords = CoordFinder.findPointCoordinates(satsCoords);

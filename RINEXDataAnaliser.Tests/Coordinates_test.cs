@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RINEXDataAnaliser;
 using RINEXDataAnaliser.DataStructures;
+using ScottPlot;
 
 namespace RINEXDataAnaliser.Tests
 {
@@ -16,27 +17,130 @@ namespace RINEXDataAnaliser.Tests
             DateTime dateTime = new DateTime(2023, 12, 27);
 
             int gnssWeek, tow;
-            (gnssWeek, tow) = GNSSTime.getGPSTime(dateTime);
+            (gnssWeek, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, dateTime);
 
             Assert.Equal((gnssWeek, tow), (2294, 259218));
         }
 
         [Fact]
-        public void testCalcutateCoordinates()
+        public void testCalcutateSatelitesCoordinates_1()
         {
-            XYZCoordinates coordinates = CoordFinder.findGPSSateliteCoordinates(
-                new DateTime(2023, 12, 27), 2294, 0, 5154.02282906, 0.038236139157200,
-                4.217675683120000e-09, 0.013043788960200, 0.999264255230000, -5.457550287250000e-07,
-                -5.774199962620000e-08, -2.71875, 4.034687500000000e+02, 1.527369022370000e-07,
-                -8.940696716310000e-08, 0.990266675599000, -1.007184810430000e-10, -1.485797943940000,
-                -8.458923776700000e-09, 7.292115146700000e-05, 259200);
+            double tow = 381600, towWeekNumber = 751, toc = 388800, tk = 380620, dtsv, tsv,
+                af0 = 0.000101, af1 = 0, af2 = 0, Mk, deltaN = 0, sqrtA = 5153.687231, M0 = 2.590622299, ecc = 0.002659071;
+            Mk = M0 + (Math.Sqrt(3.986005e14) / Math.Pow(sqrtA, 3) + deltaN) * tk;
+            tk -= 0.068934152536;
+            dtsv = af0 + af1 * (tk - toc) + af2 * Math.Pow(tk - toc, 2) + (-4.442807633e-10 * ecc * sqrtA * Math.Sin(Mk));
+            tsv = tk - dtsv;
 
-            XYZCoordinates etalonCoordinates = new XYZCoordinates(1.282810461996727e+07, -1.283969262405461e+07, 1.8919359130518474e+07);
-            XYZCoordinates precision =  new XYZCoordinates(1e-5, 1e-5, 1e-5);
+            XYZCoordinates coordinates = CoordFinder.CalcGALILEOsateliteCoordinates(
+                5153.687231, 0, 2.590622299, 0.002659071, 0.408346989, 0.000010, 0.000001, 10.031250, 188.000000,
+                0, 0, 0.960764427, 0, 0.683556631, 0, 388800, tsv - toc);
 
-            Assert.Equal(coordinates.X, etalonCoordinates.X, 1e-5);
-            Assert.Equal(coordinates.Y, etalonCoordinates.Y, 1e-5);
-            Assert.Equal(coordinates.Z, etalonCoordinates.Z, 1e-5);
+            XYZCoordinates etalonCoordinates = new XYZCoordinates(16056398.452, 579228.485, 21134571.741);
+
+            Assert.Equal(380619.930965038366, tsv, 1e-5);
+            Assert.Equal(etalonCoordinates.X, coordinates.X, 100f);
+            Assert.Equal(etalonCoordinates.Y, coordinates.Y, 100f);
+            Assert.Equal(etalonCoordinates.Z, coordinates.Z, 100f);
+        }
+
+        [Fact]
+        public void testCalcutateReciverCoordinates_1()
+        {
+            List<CalcEpoch> epoches = new();
+            CalcEpoch epoh = new CalcEpoch();
+            epoh.epochDate = new DateTime(0);
+            SatData satData = new SatData();
+            RINEXObsSateliteMeasuring measuring = new();
+
+            satData = new SatData();
+            satData.deltaSysTime = 0.000101;
+            satData.coordinates.X = 16056398.452;
+            satData.coordinates.Y = 579228.485;
+            satData.coordinates.Z = 21134571.741;
+            measuring.value = 0.068934152536 * 299792458.0;
+            satData.pseudoranges.Add("C1C", measuring);
+            epoh.satelitesData.Add("G01", satData);
+
+            satData = new SatData();
+            satData.deltaSysTime = -0.000456;
+            satData.coordinates.X = 20820911.820;
+            satData.coordinates.Y = 6730763.874;
+            satData.coordinates.Z = 14719963.263;
+            measuring.value = 0.069796642572 * 299792458.0;
+            satData.pseudoranges.Add("C1C", measuring);
+            epoh.satelitesData.Add("G11", satData);
+
+            satData = new SatData();
+            satData.deltaSysTime = 0.000204;
+            satData.coordinates.X = -1480487.219;
+            satData.coordinates.Y = 15088485.358;
+            satData.coordinates.Z = 22027822.508;
+            measuring.value = 0.071733292440 * 299792458.0;
+            satData.pseudoranges.Add("C1C", measuring);
+            epoh.satelitesData.Add("G14", satData);
+
+            satData = new SatData();
+            satData.deltaSysTime = -0.000060;
+            satData.coordinates.X = 425029.645;
+            satData.coordinates.Y = -15319179.907;
+            satData.coordinates.Z = 21952403.331;
+            measuring.value = 0.081115057551 * 299792458.0;
+            satData.pseudoranges.Add("C1C", measuring);
+            epoh.satelitesData.Add("G17", satData);
+
+            satData = new SatData();
+            satData.deltaSysTime = -0.000433;
+            satData.coordinates.X = 25780555.811;
+            satData.coordinates.Y = 7253207.115;
+            satData.coordinates.Z = -1122911.829;
+            measuring.value = 0.081504991989 * 299792458.0;
+            satData.pseudoranges.Add("C1C", measuring);
+            epoh.satelitesData.Add("G19", satData);
+
+            satData = new SatData();
+            satData.deltaSysTime = 0.000153;
+            satData.coordinates.X = 20015678.283;
+            satData.coordinates.Y = -9805991.030;
+            satData.coordinates.Z = 14196315.806;
+            measuring.value = 0.075745936146 * 299792458.0;
+            satData.pseudoranges.Add("C1C", measuring);
+            epoh.satelitesData.Add("G20", satData);
+
+            satData = new SatData();
+            satData.deltaSysTime = 0.000207;
+            satData.coordinates.X = -8132799.544;
+            satData.coordinates.Y = 22998268.460;
+            satData.coordinates.Z = 10517193.150;
+            measuring.value = 0.080086552836 * 299792458.0;
+            satData.pseudoranges.Add("C1C", measuring);
+            epoh.satelitesData.Add("G22", satData);
+
+            satData = new SatData();
+            satData.deltaSysTime = 0.000332;
+            satData.coordinates.X = 6606972.272;
+            satData.coordinates.Y = 25340032.273;
+            satData.coordinates.Z = 3457260.692;
+            measuring.value = 0.077995667166 * 299792458.0;
+            satData.pseudoranges.Add("C1C", measuring);
+            epoh.satelitesData.Add("G31", satData);
+
+            satData = new SatData();
+            satData.deltaSysTime = -0.000501;
+            satData.coordinates.X = 16824925.570;
+            satData.coordinates.Y = 3385377.209;
+            satData.coordinates.Z = 20202374.054;
+            measuring.value = 0.068801027302 * 299792458.0;
+            satData.pseudoranges.Add("C1C", measuring);
+            epoh.satelitesData.Add("G32", satData);
+
+            epoches.Add(epoh);
+
+            var coords = CoordFinder.findPointCoordinates(epoches)[0];
+
+            Assert.Equal(2846217.471, coords.X, 100f);
+            Assert.Equal(2201619.070, coords.Y, 100f);
+            Assert.Equal(5248769.341, coords.Z, 100f);
         }
     }
 }

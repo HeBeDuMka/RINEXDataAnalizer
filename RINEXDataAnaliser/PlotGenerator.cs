@@ -26,7 +26,7 @@ namespace RINEXDataAnaliser
             var sp = myPlot.Add.Scatter(lat, lon);
             sp.Smooth = true;
             sp.LegendText = "Smooth";
-            sp.LineWidth = 2;
+            sp.LineWidth = 0.5f;
             sp.MarkerSize = 10;
 
             myPlot.SavePng("!Plots/" + fileName + ".png", 1600, 900);
@@ -68,7 +68,6 @@ namespace RINEXDataAnaliser
 
                 var sp = myPlot.Add.Scatter(lon, lat);
                 myPlot.Axes.SetLimits(-180, 180, -90, 90);
-                sp.Smooth = true;
                 sp.LegendText = "Smooth";
                 sp.LineWidth = 0.5f;
                 sp.MarkerSize = 10;

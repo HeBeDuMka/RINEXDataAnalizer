@@ -299,7 +299,7 @@ namespace RINEXDataAnaliser
             return calcEpoches;
         }
 
-        public static List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, double tolerance = 1e-8, int maxIterations = 100)
+        public static List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, double tolerance = 1, int maxIterations = 100)
         {
             List<XYZCoordinates> pointCoordinates = new();
 

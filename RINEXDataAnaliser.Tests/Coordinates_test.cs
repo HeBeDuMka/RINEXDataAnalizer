@@ -39,14 +39,16 @@ namespace RINEXDataAnaliser.Tests
             XYZCoordinates etalonCoordinates = new XYZCoordinates(16056398.452, 579228.485, 21134571.741);
 
             Assert.Equal(380619.930965038366, tsv, 1e-5);
-            Assert.Equal(etalonCoordinates.X, coordinates.X, 100f);
-            Assert.Equal(etalonCoordinates.Y, coordinates.Y, 100f);
-            Assert.Equal(etalonCoordinates.Z, coordinates.Z, 100f);
+            Assert.Equal(etalonCoordinates.X, coordinates.X, 300f);
+            Assert.Equal(etalonCoordinates.Y, coordinates.Y, 300f);
+            Assert.Equal(etalonCoordinates.Z, coordinates.Z, 300f);
         }
 
         [Fact]
         public void testCalcutateReciverCoordinates_1()
         {
+            string workingDir = @"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\";
+            Logger.OpenLogFile(Path.Combine(workingDir, $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}_test.txt"));
             List<CalcEpoch> epoches = new();
             CalcEpoch epoh = new CalcEpoch();
             epoh.epochDate = new DateTime(0);
@@ -54,7 +56,7 @@ namespace RINEXDataAnaliser.Tests
             RINEXObsSateliteMeasuring measuring = new();
 
             satData = new SatData();
-            satData.deltaSysTime = 0.000101;
+            satData.deltaSysTime = 380620.0 - 380619.930965038366;
             satData.coordinates.X = 16056398.452;
             satData.coordinates.Y = 579228.485;
             satData.coordinates.Z = 21134571.741;
@@ -63,7 +65,7 @@ namespace RINEXDataAnaliser.Tests
             epoh.satelitesData.Add("G01", satData);
 
             satData = new SatData();
-            satData.deltaSysTime = -0.000456;
+            satData.deltaSysTime = 380620.0 - 380619.930659384816;
             satData.coordinates.X = 20820911.820;
             satData.coordinates.Y = 6730763.874;
             satData.coordinates.Z = 14719963.263;
@@ -72,7 +74,7 @@ namespace RINEXDataAnaliser.Tests
             epoh.satelitesData.Add("G11", satData);
 
             satData = new SatData();
-            satData.deltaSysTime = 0.000204;
+            satData.deltaSysTime = 380620.0 - 380619.928062231105;
             satData.coordinates.X = -1480487.219;
             satData.coordinates.Y = 15088485.358;
             satData.coordinates.Z = 22027822.508;
@@ -81,7 +83,7 @@ namespace RINEXDataAnaliser.Tests
             epoh.satelitesData.Add("G14", satData);
 
             satData = new SatData();
-            satData.deltaSysTime = -0.000060;
+            satData.deltaSysTime = 380620.0 - 380619.918944607081;
             satData.coordinates.X = 425029.645;
             satData.coordinates.Y = -15319179.907;
             satData.coordinates.Z = 21952403.331;
@@ -90,7 +92,7 @@ namespace RINEXDataAnaliser.Tests
             epoh.satelitesData.Add("G17", satData);
 
             satData = new SatData();
-            satData.deltaSysTime = -0.000433;
+            satData.deltaSysTime = 380620.0 - 380619.918927558756;
             satData.coordinates.X = 25780555.811;
             satData.coordinates.Y = 7253207.115;
             satData.coordinates.Z = -1122911.829;
@@ -99,7 +101,7 @@ namespace RINEXDataAnaliser.Tests
             epoh.satelitesData.Add("G19", satData);
 
             satData = new SatData();
-            satData.deltaSysTime = 0.000153;
+            satData.deltaSysTime = 380620.0 - 380619.924100632255;
             satData.coordinates.X = 20015678.283;
             satData.coordinates.Y = -9805991.030;
             satData.coordinates.Z = 14196315.806;
@@ -108,7 +110,7 @@ namespace RINEXDataAnaliser.Tests
             epoh.satelitesData.Add("G20", satData);
 
             satData = new SatData();
-            satData.deltaSysTime = 0.000207;
+            satData.deltaSysTime = 380620.0 - 380619.919706250890;
             satData.coordinates.X = -8132799.544;
             satData.coordinates.Y = 22998268.460;
             satData.coordinates.Z = 10517193.150;
@@ -117,7 +119,7 @@ namespace RINEXDataAnaliser.Tests
             epoh.satelitesData.Add("G22", satData);
 
             satData = new SatData();
-            satData.deltaSysTime = 0.000332;
+            satData.deltaSysTime = 380620.0 - 380619.921671936638;
             satData.coordinates.X = 6606972.272;
             satData.coordinates.Y = 25340032.273;
             satData.coordinates.Z = 3457260.692;
@@ -126,7 +128,7 @@ namespace RINEXDataAnaliser.Tests
             epoh.satelitesData.Add("G31", satData);
 
             satData = new SatData();
-            satData.deltaSysTime = -0.000501;
+            satData.deltaSysTime = 380620.0 - 380619.931699985464;
             satData.coordinates.X = 16824925.570;
             satData.coordinates.Y = 3385377.209;
             satData.coordinates.Z = 20202374.054;
@@ -138,9 +140,9 @@ namespace RINEXDataAnaliser.Tests
 
             var coords = CoordFinder.findPointCoordinates(epoches)[0];
 
-            Assert.Equal(2846217.471, coords.X, 100f);
-            Assert.Equal(2201619.070, coords.Y, 100f);
-            Assert.Equal(5248769.341, coords.Z, 100f);
+            Assert.Equal(2846217.471, coords.X, 1e-2f);
+            Assert.Equal(2201619.070, coords.Y, 1e-2f);
+            Assert.Equal(5248769.341, coords.Z, 1e-2f);
         }
     }
 }

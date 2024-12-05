@@ -239,6 +239,7 @@ namespace RINEXDataAnaliser
                             satData.coordinates = CalcGALILEOsateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
                                 gpsEpoch.omega, gpsEpoch.cus, gpsEpoch.cuc, gpsEpoch.crs, gpsEpoch.crc, gpsEpoch.cis, gpsEpoch.cic,
                                 gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, tsv);
+
                             Logger.WriteLineToLog($"Параметры эфемерид спутника {sateliteNumber}: sqrtA={gpsEpoch.sqrtA}, deltaN={gpsEpoch.deltaN},\n" +
                                 $"m0={gpsEpoch.m0}, ecc={gpsEpoch.e}, omega={gpsEpoch.omega}, cus={gpsEpoch.cus},\n" +
                                 $"cuc={gpsEpoch.cuc}, crs={gpsEpoch.crs}, crc={gpsEpoch.crc}, cis={gpsEpoch.cis}, cic={gpsEpoch.cic},\n" +
@@ -318,76 +319,138 @@ namespace RINEXDataAnaliser
             return calcEpoches;
         }
 
-        public static List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, double tolerance = 1, int maxIterations = 100)
+        public static Dictionary<string, double> FindSatelitesAngle(CalcEpoch curentEpoch)
+        {
+            Dictionary<string, double> angles = new();
+            XYZCoordinates reciverCoorinates = FindReciverCoordinatesOneEpoch(curentEpoch);
+
+            foreach (var (sateliteNumber, sateliteData) in curentEpoch.satelitesData)
+            {
+                DenseVector reciverCoorinatesVector = DenseVector.OfArray([reciverCoorinates.X, reciverCoorinates.Y, reciverCoorinates.Z]);
+                DenseVector sateliteCoorinatesVector = DenseVector.OfArray([sateliteData.coordinates.X, sateliteData.coordinates.Y, sateliteData.coordinates.Z]);
+
+                var lineOfSightECEF = sateliteCoorinatesVector - reciverCoorinatesVector;
+                double range = lineOfSightECEF.Norm(1);
+                var unitLineOfSightECEF = lineOfSightECEF / range;
+                double cosLat = Math.Cos(Math.Atan2(reciverCoorinates.Z, Math.Sqrt(Math.Pow(reciverCoorinates.X, 2) + Math.Pow(reciverCoorinates.Y, 2))));
+                double sinLat = Math.Sin(Math.Atan2(reciverCoorinates.Z, Math.Sqrt(Math.Pow(reciverCoorinates.X, 2) + Math.Pow(reciverCoorinates.Y, 2))));
+                double cosLon = Math.Cos(Math.Atan2(reciverCoorinates.Z, reciverCoorinates.X));
+                double sinLon = Math.Sin(Math.Atan2(reciverCoorinates.Z, reciverCoorinates.X));
+
+                double[,] rotECEF2NED = new double[3, 3]
+                {
+                    { -sinLat * cosLon, -sinLat * sinLon, cosLat },
+                    { -sinLon, cosLon, 0 },
+                    { -cosLat * cosLon, -cosLat * sinLon, -sinLat }
+                };
+
+                double[] unitLineOfSightNED = new double[3];
+                for (int i = 0; i < rotECEF2NED.GetLength(0); i++)
+                {
+                    for (int j = 0; j < rotECEF2NED.GetLength(1); j++)
+                    {
+                        unitLineOfSightNED[i] += rotECEF2NED[i, j] * unitLineOfSightECEF[j];
+                    }
+                }
+                angles.Add(sateliteNumber, -Math.Asin(unitLineOfSightNED[2]) * (180.0 / Math.PI));
+            }
+
+            return angles;
+        }
+
+        public static XYZCoordinates FindReciverCoordinatesOneEpoch(CalcEpoch curentEpoh, bool useWeightMatrix = false, double sateliteAngle = 0, double tolerance = 1, int maxIterations = 100)
+        {
+            double x = 0, y = 0, z = 0, dt = 0;
+            double dx, dy, dz, ddt;
+            int iterationNumber = 0;
+            Dictionary<string, double> sateliteAngles = new();
+            if (useWeightMatrix)
+            {
+                Logger.WriteLineToLog($"\nРасчет углов места спутников {curentEpoh.epochDate:yyyy-MM-dd-HH-mm-ss}");
+                sateliteAngles = FindSatelitesAngle(curentEpoh);
+            }
+            else
+            {
+                Logger.WriteLineToLog($"\nРасчет эпохи {curentEpoh.epochDate:yyyy-MM-dd-HH-mm-ss}");
+            }
+
+            do
+            {
+                int satelitesCount = curentEpoh.satelitesData.Count;
+                double[,] Hs = new double[satelitesCount, 4], B = new double[satelitesCount, satelitesCount];
+                double[] Es = new double[satelitesCount];
+                int lineNumber = 0;
+
+                foreach (var (sateliteNumber, sateliteData) in curentEpoh.satelitesData)
+                {
+
+                    double x_s = sateliteData.coordinates.X;
+                    double y_s = sateliteData.coordinates.Y;
+                    double z_s = sateliteData.coordinates.Z;
+
+                    double distance = Math.Sqrt(Math.Pow(x - x_s, 2) + Math.Pow(y - y_s, 2) + Math.Pow(z - z_s, 2));
+
+                    Hs[lineNumber, 0] = (x - x_s) / distance;
+                    Hs[lineNumber, 1] = (y - y_s) / distance;
+                    Hs[lineNumber, 2] = (z - z_s) / distance;
+                    Hs[lineNumber, 3] = 1;
+
+                    if (useWeightMatrix)
+                    {
+                        B[lineNumber, lineNumber] = (sateliteData.pseudoranges["C1C"].SSI / 9.0) * (sateliteAngles[sateliteNumber] / 90);
+                    }
+                    else
+                    {
+                        B[lineNumber, lineNumber] = 1;
+                    }
+                    Es[lineNumber] = sateliteData.pseudoranges["C1C"].value + speedOfLight * sateliteData.deltaSysTime - distance - dt;
+                    lineNumber++;
+                }
+
+                var Hs_matrix = DenseMatrix.OfArray(Hs);
+                var Es_matrix = DenseVector.OfArray(Es);
+                var B_matrix = DenseMatrix.OfArray(B);
+                var dOs = (Hs_matrix.Transpose() * B_matrix * Hs_matrix).Inverse() * Hs_matrix.Transpose() * B_matrix * Es_matrix;
+
+                dx = dOs[0];
+                dy = dOs[1];
+                dz = dOs[2];
+                ddt = dOs[3];
+
+                x += dOs[0];
+                y += dOs[1];
+                z += dOs[2];
+                dt += dOs[3];
+                iterationNumber++;
+                Logger.WriteLineToLog($"Поправки для координат на {iterationNumber} итерации: dx={dx}, dy={dy}, dz={dz}, ddt={ddt}");
+            } while ((Math.Abs(dx) > tolerance || Math.Abs(dy) > tolerance || Math.Abs(dz) > tolerance || Math.Abs(ddt) > tolerance) && iterationNumber < maxIterations);
+
+            return new XYZCoordinates(x, y, z);
+        }
+
+        public static List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, bool useWeightMatrix = false, double tolerance = 1, int maxIterations = 100)
         {
             List<XYZCoordinates> pointCoordinates = new();
             Logger.WriteLineToLog($"\n\nНачат расчет координат");
 
             foreach (var epochData in epochsData)
             {
-                Logger.WriteLineToLog($"\nРасчет эпохи {epochData.epochDate:yyyy-MM-dd-HH-mm-ss}");
-                // Начальные приближения координат и смещение часов приемника относительно часов системы (в метрах)
-                double x = 0, y = 0, z = 0, dt = 0;
-                double dx, dy, dz, ddt;
-                int iterationNumber = 0;
-                CalcEpoch curentEpoh = epochData;
                 bool earthSpeedTaked = false;
+                XYZCoordinates coordinates = new XYZCoordinates();
 
             start:
-
-                do
-                {
-                    int satelitesCount = curentEpoh.satelitesData.Count;
-                    double[,] Hs = new double[satelitesCount, 4];
-                    double[] Es = new double[satelitesCount];
-                    int lineNumber = 0;
-
-                    foreach (var (sateliteNumber, sateliteData) in curentEpoh.satelitesData)
-                    {
-
-                        double x_s = sateliteData.coordinates.X;
-                        double y_s = sateliteData.coordinates.Y;
-                        double z_s = sateliteData.coordinates.Z;
-                        //double angle = Math.Asin(z_s / sateliteData.pseudoranges["C1C"].value);
-
-                        double distance = Math.Sqrt(Math.Pow(x - x_s, 2) + Math.Pow(y - y_s, 2) + Math.Pow(z - z_s, 2));
-
-                        Hs[lineNumber, 0] = (x - x_s) / distance;
-                        Hs[lineNumber, 1] = (y - y_s) / distance;
-                        Hs[lineNumber, 2] = (z - z_s) / distance;
-                        Hs[lineNumber, 3] = 1;
-
-                        Es[lineNumber] = sateliteData.pseudoranges["C1C"].value + speedOfLight * sateliteData.deltaSysTime - distance - dt;
-                        lineNumber++;
-                    }
-
-                    var Hs_matrix = DenseMatrix.OfArray(Hs);
-                    var Es_matrix = DenseVector.OfArray(Es);
-                    var dOs = Hs_matrix.PseudoInverse() * Es_matrix;
-
-                    dx = dOs[0];
-                    dy = dOs[1];
-                    dz = dOs[2];
-                    ddt = dOs[3];
-
-                    x += dOs[0];
-                    y += dOs[1];
-                    z += dOs[2];
-                    dt += dOs[3];
-                    iterationNumber++;
-                    Logger.WriteLineToLog($"Поправки для координат на {iterationNumber} итерации: dx={dx}, dy={dy}, dz={dz}, ddt={ddt}");
-                } while ((Math.Abs(dx) > tolerance || Math.Abs(dy) > tolerance || Math.Abs(dz) > tolerance || Math.Abs(ddt) > tolerance) && iterationNumber < maxIterations);
+                coordinates = FindReciverCoordinatesOneEpoch(epochData, true);
 
                 if (!earthSpeedTaked)
                 {
                     Logger.WriteLineToLog($"Учет вращения Земли");
-                    foreach (var (sateliteNumber, sateliteData) in curentEpoh.satelitesData)
+                    foreach (var (sateliteNumber, sateliteData) in epochData.satelitesData)
                     {
                         double x_s = sateliteData.coordinates.X;
                         double y_s = sateliteData.coordinates.Y;
                         double z_s = sateliteData.coordinates.Z;
 
-                        double distance = Math.Sqrt(Math.Pow(x - x_s, 2) + Math.Pow(y - y_s, 2) + Math.Pow(z - z_s, 2));
+                        double distance = Math.Sqrt(Math.Pow(coordinates.X - x_s, 2) + Math.Pow(coordinates.Y - y_s, 2) + Math.Pow(coordinates.Z - z_s, 2));
 
                         double alphaJ = omegaDotE * distance / speedOfLight;
                         sateliteData.coordinates.X = x_s + y_s * alphaJ;
@@ -400,8 +463,8 @@ namespace RINEXDataAnaliser
                     Logger.WriteLineToLog($"Перерасчет координат приемника");
                     goto start;
                 }
-                Logger.WriteLineToLog($"Итоговые координаты приемника: x={x}, y={y}, z={z}");
-                pointCoordinates.Add(new XYZCoordinates(x, y, z));
+                Logger.WriteLineToLog($"Итоговые координаты приемника: x={coordinates.X}, y={coordinates.Y}, z={coordinates.Z}");
+                pointCoordinates.Add(coordinates);
             }
 
             return pointCoordinates;

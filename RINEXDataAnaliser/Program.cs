@@ -30,6 +30,7 @@ namespace RINEXDataAnaliser
             List<CalcEpoch> satsCoords = CoordFinder.FindSateliteCoord(obsFile, gpsFile, glonassFile, galileoFile, CalcOptions.GPS);
             PlotGenerator.PlotSatsTrack(satsCoords);
             List<XYZCoordinates> pointXYZCoords = CoordFinder.findPointCoordinates(satsCoords);
+            PlotGenerator.PlotXYZCoords(pointXYZCoords, "onlyGps");
 
             List<ELLCoordinates> pointELLCoords = new();
             foreach (XYZCoordinates coords in pointXYZCoords)

@@ -1,4 +1,5 @@
 ﻿using RINEXDataAnaliser.DataStructures;
+using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,34 @@ namespace RINEXDataAnaliser
             sp.LineWidth = 0.5f;
             sp.MarkerSize = 10;
 
-            myPlot.SavePng("!Plots/" + fileName + ".png", 1600, 900);
+            myPlot.SavePng("!Plots/" + fileName + "ELL.png", 1600, 900);
+        }
+
+        public static void PlotXYZCoords(List<XYZCoordinates> coordinates, string fileName)
+        {
+            double[] x = new double[coordinates.Count()], y = new double[coordinates.Count()], z = new double[coordinates.Count()],
+                time = new double[coordinates.Count()];
+            var indexedCoords = coordinates.Select((item, index) => new { Index = index, Value = item });
+
+            foreach (var data in indexedCoords)
+            {
+                time[data.Index] = data.Index;
+                x[data.Index] = data.Value.X;
+                y[data.Index] = data.Value.Y;
+                z[data.Index] = data.Value.Z;
+            }
+
+            ScottPlot.Plot plot = new();
+            plot.Add.Scatter(time, x);
+            plot.SavePng("!Plots/" + fileName + "X.png", 1600, 900);
+
+            plot = new();
+            plot.Add.Scatter(time, y);
+            plot.SavePng("!Plots/" + fileName + "Y.png", 1600, 900);
+
+            plot = new();
+            plot.Add.Scatter(time, z);
+            plot.SavePng("!Plots/" + fileName + "Z.png", 1600, 900);
         }
 
         public static void PlotSatsTrack(List<CalcEpoch> satelitesCoords)

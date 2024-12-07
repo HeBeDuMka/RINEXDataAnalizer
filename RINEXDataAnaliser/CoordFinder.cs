@@ -228,11 +228,17 @@ namespace RINEXDataAnaliser
                             Logger.WriteLineToLog($"Для спутника {sateliteNumber} выбрана эпоха за {gpsEpoch.dateTime:yyyy-MM-dd-HH-mm-ss}");
                             double obsWeekNumber, tow, toe, toc, dtsv, tsv, tk;
                             double af0 = gpsEpoch.clockBias, af1 = gpsEpoch.clockDrift, af2 = gpsEpoch.clockDriftRate;
+                            // Время приемника в системе времени GPS
                             (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, epochData.epochTime);
-                            (_, toc) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, gpsEpoch.dateTime);
+                            // Время расчет эфемерид в системе времени GPS
                             toe = gpsEpoch.ttoe;
-                            tk = ((obsWeekNumber - gpsEpoch.gpsWeek) * 604800 + tow) - toe;
-                            dtsv = af0 + af1 * (tk - toc) + af2 * Math.Pow(tk - toc, 2);
+                            // Время распространения сигнала
+                            toc = sateliteData.pseudoranges["C1C"].value / speedOfLight;
+                            // Время поршедшее с момента приема сигнала на приемнике и расчетом эфемерид
+                            tk = ((obsWeekNumber - gpsEpoch.gpsWeek) * 604800 + tow) - toe - toc;
+                            // Смещение часов спутника
+                            dtsv = af0 + af1 * (tk - toe) + af2 * Math.Pow(tk - toe, 2);
+                            // Время спутника
                             tsv = tk - dtsv;
                             Logger.WriteLineToLog($"Время для спутника {sateliteNumber}: {tsv}");
 

@@ -209,19 +209,19 @@ namespace RINEXDataAnaliser
             List<CalcEpoch> calcEpoches = new();
             CalcEpoch calcEpoch;
 
-            foreach (RINEXObsEpochData epochData in obsFile.epochDatas)
+            foreach (RINEXObsEpochData reciverEpohData in obsFile.epochDatas)
             {
                 calcEpoch = new();
                 Dictionary<string, SatData> satelitesData = new();
-                Logger.WriteLineToLog($"Расчет координат спутников для времени {epochData.epochTime:yyyy-MM-dd-HH-mm-ss}\n");
+                Logger.WriteLineToLog($"Расчет координат спутников для времени {reciverEpohData.epochTime:yyyy-MM-dd-HH-mm-ss}\n");
 
-                foreach (var (sateliteNumber, sateliteData) in epochData.satelitesData)
+                foreach (var (sateliteNumber, sateliteData) in reciverEpohData.satelitesData)
                 {
                     SatData satData = new();
 
                     if (sateliteNumber.StartsWith("G") && ((calcOptions & CalcOptions.GPS) == CalcOptions.GPS))
                     {
-                        RINEXNavGPSData gpsEpoch = navGPSFile.findNeedEpoch(sateliteNumber, epochData.epochTime);
+                        RINEXNavGPSData gpsEpoch = navGPSFile.findNeedEpoch(sateliteNumber, reciverEpohData.epochTime);
 
                         if ((gpsEpoch != null) && (gpsEpoch.svHealth == 0))
                         {
@@ -229,7 +229,7 @@ namespace RINEXDataAnaliser
                             double obsWeekNumber, tow, toe, toc, dtsv, tsv, tk;
                             double af0 = gpsEpoch.clockBias, af1 = gpsEpoch.clockDrift, af2 = gpsEpoch.clockDriftRate;
                             // Время приемника в системе времени GPS
-                            (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, epochData.epochTime);
+                            (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, reciverEpohData.epochTime);
                             // Время расчет эфемерид в системе времени GPS
                             toe = gpsEpoch.ttoe;
                             // Время распространения сигнала
@@ -268,7 +268,7 @@ namespace RINEXDataAnaliser
                     }
                     else if (sateliteNumber.StartsWith("R") && ((calcOptions & CalcOptions.GLONASS) == CalcOptions.GLONASS))
                     {
-                        RINEXNavGLONASSData gloEpoch = navGLONASSFile.findNeedEpoch(sateliteNumber, epochData.epochTime);
+                        RINEXNavGLONASSData gloEpoch = navGLONASSFile.findNeedEpoch(sateliteNumber, reciverEpohData.epochTime);
 
                         if (gloEpoch != null)
                         {
@@ -276,7 +276,7 @@ namespace RINEXDataAnaliser
                             //double timeK = timeR - sateliteData.pseudoranges["C1C"].value / speedOfLight;
                             double obsWeekNumber, tow, navWeekNumber, t0e, tk1, tk, dtk;
                             const double tauSys = -1.87661499e-7;
-                            (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GLONASS, epochData.epochTime);
+                            (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GLONASS, reciverEpohData.epochTime);
                             (navWeekNumber, t0e) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GLONASS, gloEpoch.epochTime);
                             tk1 = tow - sateliteData.pseudoranges["C1C"].value / speedOfLight;
                             dtk = tauSys + gloEpoch.clockBias - gloEpoch.frequencyBias * (tk1 - t0e);
@@ -294,12 +294,12 @@ namespace RINEXDataAnaliser
                     }
                     else if (sateliteNumber.StartsWith("E") && ((calcOptions & CalcOptions.GALILEO) == CalcOptions.GALILEO))
                     {
-                        RINEXNavGALILEOData galEpoch = navGALILEOFile.findNeedEpoch(sateliteNumber, epochData.epochTime);
+                        RINEXNavGALILEOData galEpoch = navGALILEOFile.findNeedEpoch(sateliteNumber, reciverEpohData.epochTime);
 
                         if (galEpoch != null)
                         {
                             double obsWeekNumber, tow, toe, tsv, tk;
-                            (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GALILEO, epochData.epochTime);
+                            (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GALILEO, reciverEpohData.epochTime);
                             toe = galEpoch.ttoe;
                             tk = ((obsWeekNumber - galEpoch.galWeek) * 604800 + tow) - toe;
                             tsv = tk - sateliteData.pseudoranges["C1C"].value / speedOfLight;
@@ -317,7 +317,7 @@ namespace RINEXDataAnaliser
                 }
 
                 calcEpoch.satelitesData = satelitesData;
-                calcEpoch.epochDate = epochData.epochTime;
+                calcEpoch.epochDate = reciverEpohData.epochTime;
                 calcEpoches.Add(calcEpoch);
 
                 Logger.WriteLineToLog($"------------------------------------------------------------------------------\n");

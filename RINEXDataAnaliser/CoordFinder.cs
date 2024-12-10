@@ -159,47 +159,103 @@ namespace RINEXDataAnaliser
         /// <param name="Omega0">Долгота восходящего узла орбитальной плоскости в недельную эпоху</param>
         /// <param name="omegaDot">Скорость изменения угла прямого восхождения</param>
         /// <param name="t0e">Время эфемерид в момент излучения</param>
-        /// <param name="tk">Время применика в момент прешествия (в формате времени недели GALILEO)</param>
+        /// <param name="tr">Время применика в момент прешествия (в формате времени недели GALILEO)</param>
+        /// <param name="pRange">Псевдодальность в диапазоне L1</param>
+        /// <param name="af0">Сдвиг шкалы времени спутника T^j (t_OC) относительно шкалы времени системы GPS T_GPS (t_OC ) в момент, когда показания часов системы GPS равны значению t_OC</param>
+        /// <param name="af1">Коэффициент при линейном члене в полиномиальной модели расхождения показаний часов спутника T^j (t_OC) относительно показаний часов системы GPS T_GPS (t_OC )</param>
+        /// <param name="af2">Коэффициент при квадратичном члене в полиномиальной модели расхождения показаний часов спутника T^j (t_OC) относительно показаний часов системы GPS T_GPS (t_OC )</param>
+        /// <param name="t0c">Показания часов системы GPS на узловой момент расчета поправок к показаниям спутниковых часов</param>
+        /// <param name="tgd"></param>
+        /// <param name="useRelativeDelay">Использовать ли в расчетах релятивийскую поправку</param>
         /// <returns></returns>
-        public static XYZCoordinates CalcGALILEOsateliteCoordinates(double sqrtA, double deltaN, double M0, double ecc, double omega,
+        public static (XYZCoordinates, double) CalcGALILEOsateliteCoordinates(double sqrtA, double deltaN, double M0, double ecc, double omega,
             double cus, double cuc, double crs, double crc, double cis, double cic, double i0, double iDot, double Omega0,
-            double omegaDot, double t0e, double tk)
+            double omegaDot, double t0e, double t0c, double tgd, double tr, double pRange, double af0, double af1, double af2,
+            bool useRelativeDelay)
         {
-            double A, n0, n, M, Ek1, Ek2, sinnu, cosnu, nu, phi, du, dr, di, u, r, i, xo, yo, Omega, x, y, z;
+            double Ek1, Ek2, sinnu, cosnu, nu, phi, du, dr, di, u, r, i, xo, yo, Omega, x, y, z;
             double mu = 3.986005e14;
             double omegaE = 7.2921151467e-5;
+            double C = -4.442807633e-10;
 
-            A = Math.Pow(sqrtA, 2);
-            n0 = Math.Sqrt(mu / Math.Pow(A, 3));
-            n = n0 + deltaN;
+            // Формула 1.65
+            double Tj, pDelay;
+            pDelay = pRange / speedOfLight;
+            Tj = (tr - pDelay) % 604800;
+
+            // Формула 1.69
+            double tk;
+            tk = Tj - t0e;
+
+            // Формула 1.70, 1.71
+            double n, M, dTj, TGPS;
+            n = deltaN + Math.Sqrt(mu) / Math.Pow(sqrtA, 3);
             M = M0 + n * tk;
+
+            // Формулы 1.66 - 1.68
+            if (useRelativeDelay)
+            {
+                double dTr;
+                dTr = C * ecc * sqrtA * Math.Sin(M);
+                dTj = af0 + af1 * (Tj - t0c) + af2 * Math.Pow(Tj - t0c, 2) * tgd + dTr;
+                TGPS = Tj - dTj;
+            }
+            else
+            {
+                dTj = af0 + af1 * (Tj - t0c) + af2 * Math.Pow(Tj - t0c, 2) * tgd;
+                TGPS = Tj - dTj;
+            }
+
+            tk = TGPS - t0e;
+            
+            if (tk > 302400)
+            {
+                tk -= 604800;
+            }
+            else if (tk < -302400)
+            {
+                tk += 604800;
+            }
+
+            // Формула 1.71
+            M = M0 + n * tk;
+
+            // Формула 1.72
             Ek1 = 0.0;
             Ek2 = M;
-
             while (Math.Abs(Ek1 - Ek2) > 1e-9)
             {
                 Ek1 = Ek2;
                 Ek2 -= (Ek1 - ecc * Math.Sin(Ek1) - M) / (1 - ecc * Math.Cos(Ek1));
             }
 
+            // Формула 1.73
             sinnu = (Math.Sqrt(1 - Math.Pow(ecc, 2)) * Math.Sin(Ek2)) / (1 - ecc * Math.Cos(Ek2));
             cosnu = (Math.Cos(Ek2) - ecc) / (1 - ecc * Math.Cos(Ek2));
             nu = Math.Atan2(sinnu, cosnu);
+
+            // Формулы 1.74
             phi = nu + omega;
+
+            // Формулы 1.75 - 1.77
             du = cus * Math.Sin(2 * phi) + cuc * Math.Cos(2 * phi);
             dr = crs * Math.Sin(2 * phi) + crc * Math.Cos(2 * phi);
             di = cis * Math.Sin(2 * phi) + cic * Math.Cos(2 * phi);
             u = phi + du;
-            r = A * (1 - ecc * Math.Cos(Ek2)) + dr;
+            r = Math.Pow(sqrtA, 2) * (1 - ecc * Math.Cos(Ek2)) + dr;
             i = i0 + di + iDot * tk;
+
+            // Формула 1.78
+            Omega = Omega0 + (omegaDot - omegaE) * tk - omegaE * t0e;
+
+            // Формула 1.79
             xo = r * Math.Cos(u);
             yo = r * Math.Sin(u);
-            Omega = Omega0 + (omegaDot - omegaE) * tk - omegaE * t0e;
             x = xo * Math.Cos(Omega) - yo * Math.Sin(Omega) * Math.Cos(i);
             y = xo * Math.Sin(Omega) + yo * Math.Cos(Omega) * Math.Cos(i);
             z = yo * Math.Sin(i);
 
-            return new XYZCoordinates(x ,y, z);
+            return (new XYZCoordinates(x ,y, z), dTj);
         }
 
         #endregion
@@ -226,25 +282,16 @@ namespace RINEXDataAnaliser
                         if ((gpsEpoch != null) && (gpsEpoch.svHealth == 0))
                         {
                             Logger.WriteLineToLog($"Для спутника {sateliteNumber} выбрана эпоха за {gpsEpoch.dateTime:yyyy-MM-dd-HH-mm-ss}");
-                            double obsWeekNumber, tow, toe, toc, dtsv, tsv, tk;
+                            XYZCoordinates coordinates;
+                            double tow, dtsv;
                             double af0 = gpsEpoch.clockBias, af1 = gpsEpoch.clockDrift, af2 = gpsEpoch.clockDriftRate;
                             // Время приемника в системе времени GPS
-                            (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, reciverEpohData.epochTime);
-                            // Время расчет эфемерид в системе времени GPS
-                            toe = gpsEpoch.ttoe;
-                            // Время распространения сигнала
-                            toc = sateliteData.pseudoranges["C1C"].value / speedOfLight;
-                            // Время поршедшее с момента приема сигнала на приемнике и расчетом эфемерид
-                            tk = ((obsWeekNumber - gpsEpoch.gpsWeek) * 604800 + tow) - toe - toc;
-                            // Смещение часов спутника
-                            dtsv = af0 + af1 * (tk - toe) + af2 * Math.Pow(tk - toe, 2);
-                            // Время спутника
-                            tsv = tk - dtsv;
-                            Logger.WriteLineToLog($"Время для спутника {sateliteNumber}: {tsv}");
+                            (_, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, reciverEpohData.epochTime);
 
-                            satData.coordinates = CalcGALILEOsateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
+                            (coordinates, dtsv) = CalcGALILEOsateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
                                 gpsEpoch.omega, gpsEpoch.cus, gpsEpoch.cuc, gpsEpoch.crs, gpsEpoch.crc, gpsEpoch.cis, gpsEpoch.cic,
-                                gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, tsv);
+                                gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, gpsEpoch.ttoe, gpsEpoch.tgd,
+                                tow, sateliteData.pseudoranges["C1C"].value, af0, af1, af2, true);
 
                             Logger.WriteLineToLog($"Параметры эфемерид спутника {sateliteNumber}: sqrtA={gpsEpoch.sqrtA}, deltaN={gpsEpoch.deltaN},\n" +
                                 $"m0={gpsEpoch.m0}, ecc={gpsEpoch.e}, omega={gpsEpoch.omega}, cus={gpsEpoch.cus},\n" +
@@ -252,7 +299,8 @@ namespace RINEXDataAnaliser
                                 $"i0={gpsEpoch.i0}, idot={gpsEpoch.iDot}, Omega0={gpsEpoch.omega0}, OmegaDot={gpsEpoch.omegaDot},\n" +
                                 $"toe={gpsEpoch.ttoe}, af0={gpsEpoch.clockBias}, af1={gpsEpoch.clockDrift}, af2={gpsEpoch.clockDriftRate}");
                             Logger.WriteLineToLog($"Координаты спутника {sateliteNumber}: x={satData.coordinates.X}, y={satData.coordinates.Y}, z={satData.coordinates.Z}");
-                            
+
+                            satData.coordinates = coordinates;
                             satData.pseudoranges = sateliteData.pseudoranges;
                             satData.pseudophases = sateliteData.pseudophases;
                             satData.deltaSysTime = dtsv;

@@ -11,7 +11,7 @@ namespace RINEXDataAnaliser
 {
     public class PlotGenerator
     {
-        public static void PlotEllCoords(List<ELLCoordinates> coordinates, string fileName)
+        public static void PlotEllCoords(List<ELLCoordinates> coordinates, string fileName, string workingDir)
         {
             double[] lat = new double[coordinates.Count()], lon = new double[coordinates.Count()];
             var indexedCoords = coordinates.Select((item, index) => new { Index = index, Value = item });
@@ -25,15 +25,14 @@ namespace RINEXDataAnaliser
             ScottPlot.Plot myPlot = new();
 
             var sp = myPlot.Add.Scatter(lat, lon);
-            sp.Smooth = true;
-            sp.LegendText = "Smooth";
+            myPlot.Title("Координаты приемника в геоцентрической системе координат");
             sp.LineWidth = 0.5f;
             sp.MarkerSize = 10;
 
-            myPlot.SavePng("!Plots/" + fileName + "ELL.png", 1600, 900);
+            myPlot.SavePng(Path.Combine(workingDir, fileName + "ELL.png"), 1000, 1000);
         }
 
-        public static void PlotXYZCoords(List<XYZCoordinates> coordinates, string fileName)
+        public static void PlotXYZCoords(List<XYZCoordinates> coordinates, string fileName, string workingDir)
         {
             double[] x = new double[coordinates.Count()], y = new double[coordinates.Count()], z = new double[coordinates.Count()],
                 time = new double[coordinates.Count()];
@@ -49,18 +48,21 @@ namespace RINEXDataAnaliser
 
             ScottPlot.Plot plot = new();
             plot.Add.Scatter(time, x);
-            plot.SavePng("!Plots/" + fileName + "X.png", 1600, 900);
+            plot.Title("Координата X приемника");
+            plot.SavePng(Path.Combine(workingDir, fileName + "X.png"), 1600, 900);
 
             plot = new();
             plot.Add.Scatter(time, y);
-            plot.SavePng("!Plots/" + fileName + "Y.png", 1600, 900);
+            plot.Title("Координата Y приемника");
+            plot.SavePng(Path.Combine(workingDir, fileName + "Y.png"), 1600, 900);
 
             plot = new();
             plot.Add.Scatter(time, z);
-            plot.SavePng("!Plots/" + fileName + "Z.png", 1600, 900);
+            plot.Title("Координата Z приемника");
+            plot.SavePng(Path.Combine(workingDir, fileName + "Z.png"), 1600, 900);
         }
 
-        public static void PlotSatsTrack(List<CalcEpoch> satelitesCoords)
+        public static void PlotSatsTrack(List<CalcEpoch> satelitesCoords, string workingDir)
         {
             Dictionary<string, List<XYZCoordinates>> satelitesCoordsDict = new();
             foreach (var sateliteCoords in satelitesCoords)
@@ -96,11 +98,10 @@ namespace RINEXDataAnaliser
 
                 var sp = myPlot.Add.Scatter(lon, lat);
                 myPlot.Axes.SetLimits(-180, 180, -90, 90);
-                sp.LegendText = "Smooth";
                 sp.LineWidth = 0.5f;
                 sp.MarkerSize = 10;
 
-                myPlot.SavePng("!Plots/" + sateliteNumber + ".png", 1600, 900);
+                myPlot.SavePng(Path.Combine(workingDir, sateliteNumber + ".png"), 1600, 900);
             }
         }
     }

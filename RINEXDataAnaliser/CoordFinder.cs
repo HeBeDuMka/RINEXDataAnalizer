@@ -451,7 +451,7 @@ namespace RINEXDataAnaliser
 
                     if (useWeightMatrix)
                     {
-                        B[lineNumber, lineNumber] = (sateliteData.pseudoranges["C1C"].SSI / 9.0) * (sateliteAngles[sateliteNumber] / 90);
+                        B[lineNumber, lineNumber] = (1 - (sateliteData.pseudoranges["C1C"].SSI / 9.0)) * (1 - (sateliteAngles[sateliteNumber] / 90));
                     }
                     else
                     {

@@ -406,15 +406,16 @@ namespace RINEXDataAnaliser.DataStructures
 
         public RINEXNavGALILEOData findNeedEpoch(string sateliteNumber, DateTime needEpochTime)
         {
-            TimeSpan maxTimeDelta = new TimeSpan(0, 10, 0);
+            TimeSpan epochUpdateTime = new TimeSpan(0, 10, 0);
+            TimeSpan halfEpochUpdateTime = new TimeSpan(epochUpdateTime.Ticks / 2);
             bool sateliteExist = false;
             foreach (var epoh in data)
             {
                 if (sateliteNumber == epoh.sateliteNumber)
                 {
                     sateliteExist = true;
-                    if (needEpochTime >= epoh.dateTime &&
-                       (needEpochTime - epoh.dateTime) <= maxTimeDelta)
+                    if (needEpochTime >= epoh.dateTime - halfEpochUpdateTime &&
+                       needEpochTime <= epoh.dateTime + halfEpochUpdateTime)
                     {
                         return epoh;
                     }

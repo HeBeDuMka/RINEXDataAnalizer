@@ -167,8 +167,8 @@ namespace RINEXDataAnaliser
         /// <param name="t0c">Показания часов системы GPS на узловой момент расчета поправок к показаниям спутниковых часов</param>
         /// <param name="tgd"></param>
         /// <param name="useRelativeDelay">Использовать ли в расчетах релятивийскую поправку</param>
-        /// <returns></returns>
-        public static (XYZCoordinates, double) CalcGALILEOsateliteCoordinates(double sqrtA, double deltaN, double M0, double ecc, double omega,
+        /// <returns>Координаты спутника и смещение часов спутника</returns>
+        public static (XYZCoordinates, double) CalcGalileoGpsBeidousateliteCoordinates(double sqrtA, double deltaN, double M0, double ecc, double omega,
             double cus, double cuc, double crs, double crc, double cis, double cic, double i0, double iDot, double Omega0,
             double omegaDot, double t0e, double t0c, double tgd, double tr, double pRange, double af0, double af1, double af2,
             bool useRelativeDelay)
@@ -288,7 +288,7 @@ namespace RINEXDataAnaliser
                             // Время приемника в системе времени GPS
                             (_, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GPS, reciverEpohData.epochTime);
 
-                            (coordinates, dtsv) = CalcGALILEOsateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
+                            (coordinates, dtsv) = CalcGalileoGpsBeidousateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
                                 gpsEpoch.omega, gpsEpoch.cus, gpsEpoch.cuc, gpsEpoch.crs, gpsEpoch.crc, gpsEpoch.cis, gpsEpoch.cic,
                                 gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, gpsEpoch.ttoe, gpsEpoch.tgd,
                                 tow, sateliteData.pseudoranges["C1C"].value, af0, af1, af2, true);
@@ -346,21 +346,38 @@ namespace RINEXDataAnaliser
 
                         if (galEpoch != null)
                         {
-                            double obsWeekNumber, tow, toe, tsv, tk;
-                            (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GALILEO, reciverEpohData.epochTime);
-                            toe = galEpoch.ttoe;
-                            tk = ((obsWeekNumber - galEpoch.galWeek) * 604800 + tow) - toe;
-                            tsv = tk - sateliteData.pseudoranges["C1C"].value / speedOfLight;
+                            Logger.WriteLineToLog($"Для спутника {sateliteNumber} выбрана эпоха за {galEpoch.dateTime:yyyy-MM-dd-HH-mm-ss}");
+                            XYZCoordinates coordinates;
+                            double tow, dtsv;
+                            double af0 = galEpoch.clockBias, af1 = galEpoch.clockDrift, af2 = galEpoch.clockDriftRate;
+                            // Время приемника в системе времени GPS
+                            (_, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GALILEO, reciverEpohData.epochTime);
 
-                            satData.coordinates = CalcGALILEOsateliteCoordinates(galEpoch.sqrtA, galEpoch.deltaN, galEpoch.m0, galEpoch.e,
+                            (coordinates, dtsv) = CalcGalileoGpsBeidousateliteCoordinates(galEpoch.sqrtA, galEpoch.deltaN, galEpoch.m0, galEpoch.e,
                                 galEpoch.omega, galEpoch.cus, galEpoch.cuc, galEpoch.crs, galEpoch.crc, galEpoch.cis, galEpoch.cic,
-                                galEpoch.i0, galEpoch.iDot, galEpoch.omega0, galEpoch.omegaDot, galEpoch.ttoe, tk);
+                                galEpoch.i0, galEpoch.iDot, galEpoch.omega0, galEpoch.omegaDot, galEpoch.ttoe, galEpoch.ttoe, galEpoch.ttoe,
+                                tow, sateliteData.pseudoranges["C1C"].value, af0, af1, af2, true);
 
+                            Logger.WriteLineToLog($"Параметры эфемерид спутника {sateliteNumber}: sqrtA={galEpoch.sqrtA}, deltaN={galEpoch.deltaN},\n" +
+                                $"m0={galEpoch.m0}, ecc={galEpoch.e}, omega={galEpoch.omega}, cus={galEpoch.cus},\n" +
+                                $"cuc={galEpoch.cuc}, crs={galEpoch.crs}, crc={galEpoch.crc}, cis={galEpoch.cis}, cic={galEpoch.cic},\n" +
+                                $"i0={galEpoch.i0}, idot={galEpoch.iDot}, Omega0={galEpoch.omega0}, OmegaDot={galEpoch.omegaDot},\n" +
+                                $"toe={galEpoch.ttoe}, af0={galEpoch.clockBias}, af1={galEpoch.clockDrift}, af2={galEpoch.clockDriftRate}");
+                            Logger.WriteLineToLog($"Координаты спутника {sateliteNumber}: x={satData.coordinates.X}, y={satData.coordinates.Y}, z={satData.coordinates.Z}");
+
+                            satData.coordinates = coordinates;
                             satData.pseudoranges = sateliteData.pseudoranges;
                             satData.pseudophases = sateliteData.pseudophases;
-                            satData.deltaSysTime = galEpoch.clockBias;
+                            satData.deltaSysTime = dtsv;
+                            Logger.WriteLineToLog($"Псевдодальность до спутника {sateliteNumber}: p={satData.pseudoranges["C1C"].value}");
+
                             satelitesData.Add(sateliteNumber, satData);
                         }
+                        else
+                        {
+                            Logger.WriteLineToLog($"Спутник {sateliteNumber} пропущен");
+                        }
+                        Logger.WriteLineToLog("");
                     }
                 }
 

@@ -201,19 +201,14 @@ namespace RINEXDataAnaliser
             M = M0 + n * tk;
 
             // Формулы 1.66 - 1.68
+            dTj = af0 + af1 * (Tj - t0c) + af2 * Math.Pow(Tj - t0c, 2) * tgd;
             if (useRelativeDelay)
             {
                 double dTr;
                 dTr = C * ecc * sqrtA * Math.Sin(M);
-                dTj = af0 + af1 * (Tj - t0c) + af2 * Math.Pow(Tj - t0c, 2) * tgd + dTr;
-                TGPS = Tj - dTj;
+                dTj += dTr;
             }
-            else
-            {
-                dTj = af0 + af1 * (Tj - t0c) + af2 * Math.Pow(Tj - t0c, 2) * tgd;
-                TGPS = Tj - dTj;
-            }
-
+            TGPS = Tj - dTj;
             tk = TGPS - t0e;
             
             if (tk > 302400)

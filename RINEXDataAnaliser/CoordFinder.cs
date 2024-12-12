@@ -15,13 +15,11 @@ namespace RINEXDataAnaliser
     [Flags]
     public enum CalcOptions
     {
+        None = 0,
         GPS = 0b00000001,
         GLONASS = 0b00000010,
         GALILEO = 0b00000100,
-        QZSS = 0b00001000,
-        BDS = 0b00010000,
-        SBAS = 0b00100000,
-        NAVIC = 0b01000000,
+        BEIDOU = 0b00001000
     }
     public enum GNSSSystem
     {

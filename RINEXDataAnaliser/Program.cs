@@ -11,7 +11,6 @@ namespace RINEXDataAnaliser
             Console.OutputEncoding = Encoding.UTF8;
             string workingDir = @$"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\{DateTime.Now:yyyy-MM-dd-HH-mm-ss}";
             Directory.CreateDirectory(workingDir);
-            Logger.OpenLogFile(Path.Combine(workingDir, $"log.txt"));
 
             //FTPManager ftpManager = new FTPManager("ftp://ftpupload.net", "b7_33706431", "logitech");
             //ftpManager.ChangeWorkingDir("/htdocs/GNSS/SU52/2023/12");
@@ -30,7 +29,7 @@ namespace RINEXDataAnaliser
             galileoFile.ParseFile(Path.Combine(workingDir, @"..\Brdc3610.23l"), regexManager);
             List<CalcEpoch> satsCoords = CoordFinder.FindSateliteCoord(obsFile, gpsFile, glonassFile, galileoFile, CalcOptions.GPS);
             //PlotGenerator.PlotSatsTrack(satsCoords, workingDir);
-            List<XYZCoordinates> pointXYZCoords = CoordFinder.findPointCoordinates(satsCoords);
+            List<XYZCoordinates> pointXYZCoords = CoordFinder.FindReciverCoordinates(satsCoords);
 
             List<ELLCoordinates> pointELLCoords = new();
             foreach (XYZCoordinates coords in pointXYZCoords)
@@ -41,7 +40,6 @@ namespace RINEXDataAnaliser
             }
             PlotGenerator.PlotXYZCoords(pointXYZCoords, "reciverPosition", workingDir);
             PlotGenerator.PlotEllCoords(pointELLCoords, "reciverPosition", workingDir);
-            Logger.CloseLogFile();
             return 0;
         }
     }

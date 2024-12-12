@@ -168,8 +168,8 @@ namespace RINEXDataAnaliser
         /// <returns>Координаты спутника и смещение часов спутника</returns>
         public static (XYZCoordinates, double) CalcGalileoGpsBeidousateliteCoordinates(double sqrtA, double deltaN, double M0, double ecc, double omega,
             double cus, double cuc, double crs, double crc, double cis, double cic, double i0, double iDot, double Omega0,
-            double omegaDot, double t0e, double t0c, double tgd, double tr, double pRange, double af0, double af1, double af2,
-            bool useRelativeDelay)
+            double omegaDot, double t0e, double t0c, double tgd, double tr, double pRangeL1, double pRangeL2, double af0, double af1, double af2,
+            bool useRelativeDelay, bool useIonoDelay)
         {
             double Ek1, Ek2, sinnu, cosnu, nu, phi, du, dr, di, u, r, i, xo, yo, Omega, x, y, z;
             double mu = 3.986005e14;
@@ -178,7 +178,17 @@ namespace RINEXDataAnaliser
 
             // Формула 1.65
             double Tj, pDelay;
-            pDelay = pRange / speedOfLight;
+            if (useIonoDelay)
+            {
+                double f1sq, f2sq;
+                f1sq = Math.Pow(1575.42, 2);
+                f2sq = Math.Pow(1227.2, 2);
+                pDelay = ((f1sq * pRangeL1 - f2sq * pRangeL2) / (f1sq - f2sq)) / speedOfLight;
+            }
+            else
+            {
+                pDelay = pRangeL1 / speedOfLight;
+            }
             Tj = (tr - pDelay) % 604800;
 
             // Формула 1.69
@@ -287,8 +297,7 @@ namespace RINEXDataAnaliser
                             (coordinates, dtsv) = CalcGalileoGpsBeidousateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
                                 gpsEpoch.omega, gpsEpoch.cus, gpsEpoch.cuc, gpsEpoch.crs, gpsEpoch.crc, gpsEpoch.cis, gpsEpoch.cic,
                                 gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, gpsEpoch.ttoe, gpsEpoch.tgd,
-                                tow, sateliteData.pseudoranges["C1C"].value, af0, af1, af2, true);
-
+                                tow, sateliteData.pseudoranges["C1C"].value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C2")).First().Value.value, af0, af1, af2, true, false);
 
                             satData.coordinates = coordinates;
                             satData.pseudoranges = sateliteData.pseudoranges;
@@ -339,8 +348,7 @@ namespace RINEXDataAnaliser
                             (coordinates, dtsv) = CalcGalileoGpsBeidousateliteCoordinates(galEpoch.sqrtA, galEpoch.deltaN, galEpoch.m0, galEpoch.e,
                                 galEpoch.omega, galEpoch.cus, galEpoch.cuc, galEpoch.crs, galEpoch.crc, galEpoch.cis, galEpoch.cic,
                                 galEpoch.i0, galEpoch.iDot, galEpoch.omega0, galEpoch.omegaDot, galEpoch.ttoe, galEpoch.ttoe, galEpoch.ttoe,
-                                tow, sateliteData.pseudoranges["C1C"].value, af0, af1, af2, true);
-
+                                tow, sateliteData.pseudoranges["C1C"].value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C2")).First().Value.value, af0, af1, af2, true, true);
 
                             satData.coordinates = coordinates;
                             satData.pseudoranges = sateliteData.pseudoranges;

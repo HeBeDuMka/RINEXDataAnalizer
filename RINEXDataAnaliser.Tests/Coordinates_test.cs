@@ -239,7 +239,7 @@ namespace RINEXDataAnaliser.Tests
 
             epoches.Add(epoh);
 
-            var coords = CoordFinder.findPointCoordinates(epoches)[0];
+            var coords = CoordFinder.FindReciverCoordinates(epoches)[0];
 
             Assert.Equal(2846217.471, coords.X, 1e-2f);
             Assert.Equal(2201619.070, coords.Y, 1e-2f);

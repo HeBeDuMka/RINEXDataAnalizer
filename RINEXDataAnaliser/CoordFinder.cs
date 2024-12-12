@@ -517,7 +517,7 @@ namespace RINEXDataAnaliser
             return new XYZCoordinates(x, y, z);
         }
 
-        public static List<XYZCoordinates> findPointCoordinates(List<CalcEpoch> epochsData, bool useWeightMatrix = false, double tolerance = 1, int maxIterations = 100)
+        public static List<XYZCoordinates> FindReciverCoordinates(List<CalcEpoch> epochsData, bool useWeightMatrix = false, double minEvaluationAngle = 0, double tolerance = 1, int maxIterations = 100)
         {
             List<XYZCoordinates> pointCoordinates = new();
 
@@ -527,7 +527,7 @@ namespace RINEXDataAnaliser
                 XYZCoordinates coordinates = new XYZCoordinates();
 
             start:
-                coordinates = FindReciverCoordinatesOneEpoch(epochData, true);
+                coordinates = FindReciverCoordinatesOneEpoch(epochData, true, minEvaluationAngle);
 
                 if (!earthSpeedTaked)
                 {

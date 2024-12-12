@@ -407,12 +407,11 @@ namespace RINEXDataAnaliser
             return angles;
         }
 
-        public static XYZCoordinates FindReciverCoordinatesOneEpoch(CalcEpoch curentEpoh, bool useWeightMatrix = false, double sateliteAngle = 0, double tolerance = 1, int maxIterations = 100)
+        public static XYZCoordinates FindRawReciverCoordinates(CalcEpoch curentEpoh, double tolerance = 1, int maxIterations = 100)
         {
             double x = 0, y = 0, z = 0, dt = 0;
             double dx, dy, dz, ddt;
             int iterationNumber = 0;
-            Dictionary<string, double> sateliteAngles = new();
 
             do
             {
@@ -423,7 +422,6 @@ namespace RINEXDataAnaliser
 
                 foreach (var (sateliteNumber, sateliteData) in curentEpoh.satelitesData)
                 {
-
                     double x_s = sateliteData.coordinates.X;
                     double y_s = sateliteData.coordinates.Y;
                     double z_s = sateliteData.coordinates.Z;
@@ -435,21 +433,73 @@ namespace RINEXDataAnaliser
                     Hs[lineNumber, 2] = (z - z_s) / distance;
                     Hs[lineNumber, 3] = 1;
 
-                    if (useWeightMatrix)
-                    {
-                        B[lineNumber, lineNumber] = (1 - (sateliteData.pseudoranges["C1C"].SSI / 9.0)) * (1 - (sateliteAngles[sateliteNumber] / 90));
-                    }
-                    else
-                    {
-                        B[lineNumber, lineNumber] = 1;
-                    }
                     Es[lineNumber] = sateliteData.pseudoranges["C1C"].value + speedOfLight * sateliteData.deltaSysTime - distance - dt;
                     lineNumber++;
                 }
 
                 var Hs_matrix = DenseMatrix.OfArray(Hs);
                 var Es_matrix = DenseVector.OfArray(Es);
-                var B_matrix = DenseMatrix.OfArray(B);
+                var dOs = (Hs_matrix.Transpose() * Hs_matrix).Inverse() * Hs_matrix.Transpose() * Es_matrix;
+
+                dx = dOs[0];
+                dy = dOs[1];
+                dz = dOs[2];
+                ddt = dOs[3];
+
+                x += dOs[0];
+                y += dOs[1];
+                z += dOs[2];
+                dt += dOs[3];
+                iterationNumber++;
+            } while ((Math.Abs(dx) > tolerance || Math.Abs(dy) > tolerance || Math.Abs(dz) > tolerance || Math.Abs(ddt) > tolerance) && iterationNumber < maxIterations);
+
+            return new XYZCoordinates(x, y, z);
+        }
+
+        public static XYZCoordinates FindReciverCoordinatesOneEpoch(CalcEpoch curentEpoh, bool useWeightMatrix = false, double sateliteAngle = 0, double tolerance = 1,
+            int maxIterations = 100)
+        {
+            double x = 0, y = 0, z = 0, dt = 0;
+            double dx, dy, dz, ddt;
+            int iterationNumber = 0;
+            Dictionary<string, double> sateliteAngles = FindSatelitesAngle(curentEpoh);
+
+            do
+            {
+                int satelitesCount = curentEpoh.satelitesData.Count;
+                List<List<double>> Hs = new List<List<double>>();
+                List<double> B = new List<double>();
+                List<double> Es = new List<double>();
+                int lineNumber = 0;
+
+                foreach (var (sateliteNumber, sateliteData) in curentEpoh.satelitesData)
+                {
+                    if (sateliteAngles[sateliteNumber] >= sateliteAngle)
+                    {
+                        double x_s = sateliteData.coordinates.X;
+                        double y_s = sateliteData.coordinates.Y;
+                        double z_s = sateliteData.coordinates.Z;
+
+                        double distance = Math.Sqrt(Math.Pow(x - x_s, 2) + Math.Pow(y - y_s, 2) + Math.Pow(z - z_s, 2));
+
+                        Hs.Add(new List<double> { (x - x_s) / distance, (y - y_s) / distance, (z - z_s) / distance, 1 });
+
+                        if (useWeightMatrix)
+                        {
+                            B.Add((1 - (sateliteData.pseudoranges["C1C"].SSI / 9.0)) * (1 - (sateliteAngles[sateliteNumber] / 90)));
+                        }
+                        else
+                        {
+                            B.Add(1);
+                        }
+                        Es.Add(sateliteData.pseudoranges["C1C"].value + speedOfLight * sateliteData.deltaSysTime - distance - dt);
+                        lineNumber++;
+                    }
+                }
+
+                var Hs_matrix = DenseMatrix.OfRows(Hs);
+                var Es_matrix = DenseVector.OfEnumerable(Es);
+                var B_matrix = Matrix.Build.Diagonal(B.ToArray());
                 var dOs = (Hs_matrix.Transpose() * B_matrix * Hs_matrix).Inverse() * Hs_matrix.Transpose() * B_matrix * Es_matrix;
 
                 dx = dOs[0];

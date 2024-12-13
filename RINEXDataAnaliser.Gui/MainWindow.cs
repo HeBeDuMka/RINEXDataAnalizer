@@ -56,16 +56,19 @@ namespace RINEXDataAnaliser.Gui
                 else if (fileDialog.FileName.EndsWith("g"))
                 {
                     GLONASSCheckBox.Enabled = true;
+                    GLONASSCheckBox.Checked = true;
                     glonassNavFile.parceFile(fileDialog.FileName, regexManager);
                 }
                 else if (fileDialog.FileName.EndsWith("l"))
                 {
                     GalileoCheckBox.Enabled = true;
+                    GalileoCheckBox.Checked = true;
                     galileoNavFile.ParseFile(fileDialog.FileName, regexManager);
                 }
                 else if (fileDialog.FileName.EndsWith("n"))
                 {
                     GPSCheckbox.Enabled = true;
+                    GPSCheckbox.Checked = true;
                     gpsNavFile.ParceFile(fileDialog.FileName, regexManager);
                 }
             }

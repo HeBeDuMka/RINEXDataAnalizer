@@ -134,7 +134,7 @@ namespace RINEXDataAnaliser
 
         #endregion
 
-        #region GALILEO
+        #region GALILEO, GPS, Beidou
 
         /// <summary>
         /// Функция для расчета координат спутника GALILEO

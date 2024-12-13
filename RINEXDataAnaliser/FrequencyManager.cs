@@ -10,24 +10,47 @@ namespace RINEXDataAnaliser
     {
         private static readonly Dictionary<string, double> GPSFrequencyRanges = new Dictionary<string, double>
         {
-            { "L1", 1575.42 },
-            { "L2", 1227.60 },
-            { "L5", 1176.45 }
+            { "L1", 1575.42e6 },
+            { "L2", 1227.60e6 },
+            { "L5", 1176.45e6 }
         };
 
-        public static double getGammaGPS()
+        private static readonly Dictionary<string, double> GLONASSFrequencyRanges = new Dictionary<string, double>
         {
-            return Math.Pow(GPSFrequencyRanges["L1"] / GPSFrequencyRanges["L2"], 2);
-        }
+            { "G1", 1602.0 },
+            { "G2", 1246.0 }
+        };
 
-        public static (double, double) getK1AndK2CoefsGPS()
+        private static readonly Dictionary<string, double> GalileoFrequencyRanges = new Dictionary<string, double>
         {
-            double k1, k2;
+            { "E1", 1575.42e6 },
+            { "E6", 1278.75e6 },
+            { "E5a", 1176.45e6 },
+            { "E5b", 1207.14e6 }
+        };
 
-            k1 = Math.Pow(GPSFrequencyRanges["L1"], 2) / (Math.Pow(GPSFrequencyRanges["L1"], 2) - Math.Pow(GPSFrequencyRanges["L2"], 2));
-            k2 = Math.Pow(GPSFrequencyRanges["L2"], 2) / (Math.Pow(GPSFrequencyRanges["L1"], 2) - Math.Pow(GPSFrequencyRanges["L2"], 2));
+        private static readonly Dictionary<string, double> BeidouFrequencyRanges = new Dictionary<string, double>
+        {
+            { "B1", 1575.42 },
+            { "B2", 1191.795 },
+            { "B3", 1268.52 }
+        };
 
-            return (k1, k2);
+        public static (double, double) getTwoFreq(GNSSSystem gnssSystem, string f1Name, string f2Name)
+        {
+            switch (gnssSystem)
+            {
+                case GNSSSystem.GPS:
+                    return (GPSFrequencyRanges[f1Name], GPSFrequencyRanges[f2Name]);
+                case GNSSSystem.GLONASS:
+                    return (GLONASSFrequencyRanges[f1Name], GLONASSFrequencyRanges[f2Name]);
+                case GNSSSystem.GALILEO:
+                    return (GalileoFrequencyRanges[f1Name], GalileoFrequencyRanges[f2Name]);
+                case GNSSSystem.BEIDOU:
+                    return (BeidouFrequencyRanges[f1Name], BeidouFrequencyRanges[f2Name]);
+                default:
+                    return (0, 0);
+            }
         }
     }
 }

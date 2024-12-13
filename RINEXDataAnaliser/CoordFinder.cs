@@ -345,7 +345,8 @@ namespace RINEXDataAnaliser
                             (coordinates, dtsv) = CalcGalileoGpsBeidousateliteCoordinates(galEpoch.sqrtA, galEpoch.deltaN, galEpoch.m0, galEpoch.e,
                                 galEpoch.omega, galEpoch.cus, galEpoch.cuc, galEpoch.crs, galEpoch.crc, galEpoch.cis, galEpoch.cic,
                                 galEpoch.i0, galEpoch.iDot, galEpoch.omega0, galEpoch.omegaDot, galEpoch.ttoe, galEpoch.ttoe, galEpoch.ttoe,
-                                tow, sateliteData.pseudoranges["C1C"].value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C2")).First().Value.value, af0, af1, af2, true, true);
+                                tow, sateliteData.pseudoranges["C1C"].value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C2")).First().Value.value,
+                                af0, af1, af2, useRelativeCorr, useIonoDelayCorr, useTropoDelayCorr);
 
                             satData.coordinates = coordinates;
                             satData.pseudoranges = sateliteData.pseudoranges;

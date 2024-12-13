@@ -26,9 +26,7 @@ namespace RINEXDataAnaliser
         GPS,
         GLONASS,
         GALILEO,
-        BDS,
-        QZSS,
-        SBAS
+        BEIDOU
     }
 
     public class CalcEpoch

@@ -17,14 +17,10 @@ namespace RINEXDataAnaliser.DataStructures
                     return new DateTime(1980, 1, 6, 0, 0, 0);
                 case GNSSSystem.GLONASS:
                     return new DateTime(1980, 1, 6, 0, 0, 0);
-                case GNSSSystem.BDS:
-                    return new DateTime(2006, 1, 1, 0, 0, 0);
+                case GNSSSystem.BEIDOU:
+                    return new DateTime(1980, 1, 6, 0, 0, 0);
                 case GNSSSystem.GALILEO:
                     return new DateTime(1980, 1, 6, 0, 0, 0);
-                case GNSSSystem.SBAS:
-                    return new DateTime(1970, 1, 1, 0, 0, 18);
-                case GNSSSystem.QZSS:
-                    return new DateTime(1970, 1, 1, 0, 0, 18);
                 default:
                     return new DateTime(1970, 1, 1, 0, 0, 0);
             }

@@ -113,5 +113,12 @@ namespace RINEXDataAnaliser.Gui
                 RelativicCorrectionCheckBox.Checked, IonosphericCorrectionCheckBox.Checked, TroposphericCorrection.Checked);
             reciverCoordinates = CoordFinder.FindReciverCoordinates(satelitesCoordsAndPseudoranges, true, Convert.ToDouble(minSateliteAngleUpDown.Value));
         }
+
+        private void OpenEllGraph_Click(object sender, EventArgs e)
+        {
+            EllCoordinatesGraph ellCoordinatesForm = new();
+            ellCoordinatesForm.Show();
+            ellCoordinatesForm.plotGraph(reciverCoordinates);
+        }
     }
 }

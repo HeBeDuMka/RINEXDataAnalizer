@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ScottPlot" Version="5.0.47" />
+    <PackageReference Include="ScottPlot.WinForms" Version="5.0.47" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RINEXDataAnaliser\RINEXDataAnaliser.csproj" />
   </ItemGroup>
 

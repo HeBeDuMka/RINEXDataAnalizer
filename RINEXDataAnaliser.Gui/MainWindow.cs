@@ -109,11 +109,18 @@ namespace RINEXDataAnaliser.Gui
             reciverCoordinates = CoordFinder.FindReciverCoordinates(satelitesCoordsAndPseudoranges, true, Convert.ToDouble(minSateliteAngleUpDown.Value));
         }
 
-        private void OpenEllGraph_Click(object sender, EventArgs e)
+        private void PlotEllCoordinatesButton_Click(object sender, EventArgs e)
         {
-            EllCoordinatesGraph ellCoordinatesForm = new();
-            ellCoordinatesForm.Show();
-            ellCoordinatesForm.plotGraph(reciverCoordinates);
+            EllCoordinatesGraph ellCoordinatesGraph = new();
+            ellCoordinatesGraph.plotGraph(reciverCoordinates, Convert.ToInt32(PointSizeUpDown.Value), Convert.ToSingle(LineThicknessUpDown.Value));
+            ellCoordinatesGraph.Show();
+        }
+
+        private void PlotXYZCoordinatesButton_Click(object sender, EventArgs e)
+        {
+            XYZCoordinatesGraph xyzCoordinatesGraph = new();
+            xyzCoordinatesGraph.plotGraph(reciverCoordinates, Convert.ToInt32(PointSizeUpDown.Value), Convert.ToSingle(LineThicknessUpDown.Value), obsFile.header.approxPosition);
+            xyzCoordinatesGraph.Show();
         }
     }
 }

@@ -52,6 +52,14 @@
             GLONASSCheckBox = new CheckBox();
             GPSCheckbox = new CheckBox();
             GraphTab = new TabPage();
+            groupBox3 = new GroupBox();
+            needLineCheckBox = new CheckBox();
+            label3 = new Label();
+            LineThicknessUpDown = new NumericUpDown();
+            label2 = new Label();
+            PointSizeUpDown = new NumericUpDown();
+            PlotXYZCoordinatesButton = new Button();
+            PlotEllCoordinatesButton = new Button();
             tabControl1.SuspendLayout();
             InputDataTab.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -60,6 +68,10 @@
             CorrectionsGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)minSateliteAngleUpDown).BeginInit();
             GNSSGroupBox.SuspendLayout();
+            GraphTab.SuspendLayout();
+            groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)LineThicknessUpDown).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)PointSizeUpDown).BeginInit();
             SuspendLayout();
             // 
             // tabControl1
@@ -308,12 +320,96 @@
             // 
             // GraphTab
             // 
+            GraphTab.Controls.Add(groupBox3);
+            GraphTab.Controls.Add(PlotXYZCoordinatesButton);
+            GraphTab.Controls.Add(PlotEllCoordinatesButton);
             GraphTab.Location = new Point(4, 24);
             GraphTab.Name = "GraphTab";
             GraphTab.Size = new Size(403, 398);
             GraphTab.TabIndex = 2;
             GraphTab.Text = "Результат";
             GraphTab.UseVisualStyleBackColor = true;
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(needLineCheckBox);
+            groupBox3.Controls.Add(label3);
+            groupBox3.Controls.Add(LineThicknessUpDown);
+            groupBox3.Controls.Add(label2);
+            groupBox3.Controls.Add(PointSizeUpDown);
+            groupBox3.Location = new Point(3, 3);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(397, 181);
+            groupBox3.TabIndex = 4;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Параметры графиков";
+            // 
+            // needLineCheckBox
+            // 
+            needLineCheckBox.AutoSize = true;
+            needLineCheckBox.Location = new Point(208, 64);
+            needLineCheckBox.Name = "needLineCheckBox";
+            needLineCheckBox.Size = new Size(119, 19);
+            needLineCheckBox.TabIndex = 6;
+            needLineCheckBox.Text = "Соединять точки";
+            needLineCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(16, 65);
+            label3.Name = "label3";
+            label3.Size = new Size(96, 15);
+            label3.TabIndex = 5;
+            label3.Text = "Толщина линии";
+            // 
+            // LineThicknessUpDown
+            // 
+            LineThicknessUpDown.Increment = new decimal(new int[] { 5, 0, 0, 65536 });
+            LineThicknessUpDown.Location = new Point(138, 61);
+            LineThicknessUpDown.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
+            LineThicknessUpDown.Name = "LineThicknessUpDown";
+            LineThicknessUpDown.Size = new Size(44, 23);
+            LineThicknessUpDown.TabIndex = 4;
+            LineThicknessUpDown.Value = new decimal(new int[] { 5, 0, 0, 65536 });
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(16, 32);
+            label2.Name = "label2";
+            label2.Size = new Size(82, 15);
+            label2.TabIndex = 3;
+            label2.Text = "Размер точки";
+            // 
+            // PointSizeUpDown
+            // 
+            PointSizeUpDown.Location = new Point(138, 28);
+            PointSizeUpDown.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            PointSizeUpDown.Name = "PointSizeUpDown";
+            PointSizeUpDown.Size = new Size(44, 23);
+            PointSizeUpDown.TabIndex = 2;
+            PointSizeUpDown.Value = new decimal(new int[] { 3, 0, 0, 0 });
+            // 
+            // PlotXYZCoordinatesButton
+            // 
+            PlotXYZCoordinatesButton.Location = new Point(3, 219);
+            PlotXYZCoordinatesButton.Name = "PlotXYZCoordinatesButton";
+            PlotXYZCoordinatesButton.Size = new Size(397, 23);
+            PlotXYZCoordinatesButton.TabIndex = 3;
+            PlotXYZCoordinatesButton.Text = "Открыть график в геоцентрической системе координат";
+            PlotXYZCoordinatesButton.UseVisualStyleBackColor = true;
+            PlotXYZCoordinatesButton.Click += PlotXYZCoordinatesButton_Click;
+            // 
+            // PlotEllCoordinatesButton
+            // 
+            PlotEllCoordinatesButton.Location = new Point(3, 190);
+            PlotEllCoordinatesButton.Name = "PlotEllCoordinatesButton";
+            PlotEllCoordinatesButton.Size = new Size(397, 23);
+            PlotEllCoordinatesButton.TabIndex = 2;
+            PlotEllCoordinatesButton.Text = "Открыть график в геодезической системе координат";
+            PlotEllCoordinatesButton.UseVisualStyleBackColor = true;
+            PlotEllCoordinatesButton.Click += PlotEllCoordinatesButton_Click;
             // 
             // MainWindow
             // 
@@ -336,6 +432,11 @@
             ((System.ComponentModel.ISupportInitialize)minSateliteAngleUpDown).EndInit();
             GNSSGroupBox.ResumeLayout(false);
             GNSSGroupBox.PerformLayout();
+            GraphTab.ResumeLayout(false);
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)LineThicknessUpDown).EndInit();
+            ((System.ComponentModel.ISupportInitialize)PointSizeUpDown).EndInit();
             ResumeLayout(false);
         }
 
@@ -365,5 +466,13 @@
         private CheckBox RelativicCorrectionCheckBox;
         private Label label1;
         private NumericUpDown minSateliteAngleUpDown;
+        private GroupBox groupBox3;
+        private Button PlotXYZCoordinatesButton;
+        private Button PlotEllCoordinatesButton;
+        private Label label3;
+        private NumericUpDown LineThicknessUpDown;
+        private Label label2;
+        private NumericUpDown PointSizeUpDown;
+        private CheckBox needLineCheckBox;
     }
 }

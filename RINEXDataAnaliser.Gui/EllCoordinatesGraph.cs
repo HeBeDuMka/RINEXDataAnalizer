@@ -20,7 +20,7 @@ namespace RINEXDataAnaliser.Gui
             InitializeComponent();
         }
 
-        public void plotGraph(List<XYZCoordinates> reciverXYZCoordinates)
+        public void plotGraph(List<XYZCoordinates> reciverXYZCoordinates, int pointSize, float LineThickness)
         {
             List<ELLCoordinates> reciverELLCoordinates = new();
             foreach (XYZCoordinates coords in reciverXYZCoordinates)
@@ -41,8 +41,8 @@ namespace RINEXDataAnaliser.Gui
 
             var sp = EllCoordinatesPlot.Plot.Add.Scatter(lat, lon);
             EllCoordinatesPlot.Plot.Title("Координаты приемника в геоцентрической системе координат");
-            sp.LineWidth = 0.5f;
-            sp.MarkerSize = 10;
+            sp.LineWidth = LineThickness;
+            sp.MarkerSize = pointSize;
         }
     }
 }

@@ -292,7 +292,10 @@ namespace RINEXDataAnaliser.DataStructures
                     else
                     {
                         Match match = regexManager.obsEpohs[line[0].ToString()].Match(line);
-                        if (match.Success)
+                        if (match.Success && match.Groups["Satelite_number"].Value.StartsWith("C") &&
+                            match.Groups["Satelite_number"].Value.StartsWith("E") &&
+                            match.Groups["Satelite_number"].Value.StartsWith("R") &&
+                            match.Groups["Satelite_number"].Value.StartsWith("G"))
                         {
                             RINEXObsSateliteData sateliteData = new();
                             for (int i = 2; i < match.Groups.Count; i += 3)

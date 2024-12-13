@@ -109,7 +109,8 @@ namespace RINEXDataAnaliser.Gui
                 calculationOptions |= CalcOptions.BEIDOU;
             }
 
-            satelitesCoordsAndPseudoranges = CoordFinder.FindSateliteCoord(obsFile, gpsNavFile, glonassNavFile, galileoNavFile, calculationOptions);
+            satelitesCoordsAndPseudoranges = CoordFinder.FindSateliteCoord(obsFile, gpsNavFile, glonassNavFile, galileoNavFile, calculationOptions,
+                RelativicCorrectionCheckBox.Checked, IonosphericCorrectionCheckBox.Checked, TroposphericCorrection.Checked);
             reciverCoordinates = CoordFinder.FindReciverCoordinates(satelitesCoordsAndPseudoranges, true, Convert.ToDouble(minSateliteAngleUpDown.Value));
         }
     }

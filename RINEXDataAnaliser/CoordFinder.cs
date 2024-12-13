@@ -169,7 +169,7 @@ namespace RINEXDataAnaliser
         public static (XYZCoordinates, double) CalcGalileoGpsBeidousateliteCoordinates(double sqrtA, double deltaN, double M0, double ecc, double omega,
             double cus, double cuc, double crs, double crc, double cis, double cic, double i0, double iDot, double Omega0,
             double omegaDot, double t0e, double t0c, double tgd, double tr, double pRangeL1, double pRangeL2, double af0, double af1, double af2,
-            bool useRelativeDelay, bool useIonoDelay)
+            bool useRelativeDelay, bool useIonoDelay, bool useTropoDelay)
         {
             double Ek1, Ek2, sinnu, cosnu, nu, phi, du, dr, di, u, r, i, xo, yo, Omega, x, y, z;
             double mu = 3.986005e14;
@@ -263,7 +263,8 @@ namespace RINEXDataAnaliser
 
         #endregion
 
-        public static List<CalcEpoch> FindSateliteCoord(RINEXObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, RINEXNavGALILEOFile navGALILEOFile, CalcOptions calcOptions)
+        public static List<CalcEpoch> FindSateliteCoord(RINEXObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, RINEXNavGALILEOFile navGALILEOFile, CalcOptions calcOptions,
+            bool useRelativeCorr, bool useIonoDelayCorr, bool useTropoDelayCorr)
         {
             List<CalcEpoch> calcEpoches = new();
             CalcEpoch calcEpoch;
@@ -292,7 +293,8 @@ namespace RINEXDataAnaliser
                             (coordinates, dtsv) = CalcGalileoGpsBeidousateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
                                 gpsEpoch.omega, gpsEpoch.cus, gpsEpoch.cuc, gpsEpoch.crs, gpsEpoch.crc, gpsEpoch.cis, gpsEpoch.cic,
                                 gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, gpsEpoch.ttoe, gpsEpoch.tgd,
-                                tow, sateliteData.pseudoranges["C1C"].value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C2")).First().Value.value, af0, af1, af2, true, false);
+                                tow, sateliteData.pseudoranges["C1C"].value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C2")).First().Value.value,
+                                af0, af1, af2, useRelativeCorr, useIonoDelayCorr, useTropoDelayCorr);
 
                             satData.coordinates = coordinates;
                             satData.pseudoranges = sateliteData.pseudoranges;

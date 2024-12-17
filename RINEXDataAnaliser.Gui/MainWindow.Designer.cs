@@ -66,32 +66,32 @@
             IacServerAdressTextBox4 = new TextBox();
             IacServerAdressLabel = new Label();
             SettingsTab = new TabPage();
+            tableLayoutPanel11 = new TableLayoutPanel();
             CorrectionsGroupBox = new GroupBox();
-            TroposphericCorrection = new CheckBox();
-            IonosphericCorrectionCheckBox = new CheckBox();
+            tableLayoutPanel13 = new TableLayoutPanel();
             RelativicCorrectionCheckBox = new CheckBox();
-            MinSateliteAngleLabel = new Label();
+            IonosphericCorrectionCheckBox = new CheckBox();
+            TroposphericCorrection = new CheckBox();
+            tableLayoutPanel14 = new TableLayoutPanel();
             minSateliteAngleUpDown = new NumericUpDown();
+            MinSateliteAngleLabel = new Label();
             GNSSGroupBox = new GroupBox();
+            tableLayoutPanel12 = new TableLayoutPanel();
             BeidouCheckBox = new CheckBox();
             GalileoCheckBox = new CheckBox();
             GLONASSCheckBox = new CheckBox();
             GPSCheckbox = new CheckBox();
             GraphTab = new TabPage();
             GraphsSettingsGroupBox = new GroupBox();
-            LineThicknessLabel = new Label();
-            LineThicknessUpDown = new NumericUpDown();
-            PointSizeLabel = new Label();
+            tableLayoutPanel15 = new TableLayoutPanel();
             PointSizeUpDown = new NumericUpDown();
+            PointSizeLabel = new Label();
+            LineThicknessUpDown = new NumericUpDown();
+            LineThicknessLabel = new Label();
             PlotXYZCoordinatesButton = new Button();
             PlotEllCoordinatesButton = new Button();
             WindowLayoutPanel = new TableLayoutPanel();
             LogTextBox = new RichTextBox();
-            tableLayoutPanel11 = new TableLayoutPanel();
-            tableLayoutPanel12 = new TableLayoutPanel();
-            tableLayoutPanel13 = new TableLayoutPanel();
-            tableLayoutPanel14 = new TableLayoutPanel();
-            tableLayoutPanel15 = new TableLayoutPanel();
             WindowTabControl.SuspendLayout();
             InputDataTab.SuspendLayout();
             tableLayoutPanel10.SuspendLayout();
@@ -112,19 +112,19 @@
             tableLayoutPanel6.SuspendLayout();
             tableLayoutPanel7.SuspendLayout();
             SettingsTab.SuspendLayout();
-            CorrectionsGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)minSateliteAngleUpDown).BeginInit();
-            GNSSGroupBox.SuspendLayout();
-            GraphTab.SuspendLayout();
-            GraphsSettingsGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)LineThicknessUpDown).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)PointSizeUpDown).BeginInit();
-            WindowLayoutPanel.SuspendLayout();
             tableLayoutPanel11.SuspendLayout();
-            tableLayoutPanel12.SuspendLayout();
+            CorrectionsGroupBox.SuspendLayout();
             tableLayoutPanel13.SuspendLayout();
             tableLayoutPanel14.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)minSateliteAngleUpDown).BeginInit();
+            GNSSGroupBox.SuspendLayout();
+            tableLayoutPanel12.SuspendLayout();
+            GraphTab.SuspendLayout();
+            GraphsSettingsGroupBox.SuspendLayout();
             tableLayoutPanel15.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)PointSizeUpDown).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)LineThicknessUpDown).BeginInit();
+            WindowLayoutPanel.SuspendLayout();
             SuspendLayout();
             // 
             // WindowTabControl
@@ -590,6 +590,21 @@
             SettingsTab.Text = "Параметры расчета";
             SettingsTab.UseVisualStyleBackColor = true;
             // 
+            // tableLayoutPanel11
+            // 
+            tableLayoutPanel11.ColumnCount = 1;
+            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel11.Controls.Add(CorrectionsGroupBox, 0, 1);
+            tableLayoutPanel11.Controls.Add(GNSSGroupBox, 0, 0);
+            tableLayoutPanel11.Dock = DockStyle.Fill;
+            tableLayoutPanel11.Location = new Point(3, 3);
+            tableLayoutPanel11.Name = "tableLayoutPanel11";
+            tableLayoutPanel11.RowCount = 2;
+            tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
+            tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Percent, 70F));
+            tableLayoutPanel11.Size = new Size(395, 410);
+            tableLayoutPanel11.TabIndex = 2;
+            // 
             // CorrectionsGroupBox
             // 
             CorrectionsGroupBox.Controls.Add(tableLayoutPanel13);
@@ -601,27 +616,25 @@
             CorrectionsGroupBox.TabStop = false;
             CorrectionsGroupBox.Text = "Коррекции";
             // 
-            // TroposphericCorrection
+            // tableLayoutPanel13
             // 
-            TroposphericCorrection.AutoSize = true;
-            TroposphericCorrection.Dock = DockStyle.Fill;
-            TroposphericCorrection.Location = new Point(3, 41);
-            TroposphericCorrection.Name = "TroposphericCorrection";
-            TroposphericCorrection.Size = new Size(377, 32);
-            TroposphericCorrection.TabIndex = 5;
-            TroposphericCorrection.Text = "Тропосферная коррекция";
-            TroposphericCorrection.UseVisualStyleBackColor = true;
-            // 
-            // IonosphericCorrectionCheckBox
-            // 
-            IonosphericCorrectionCheckBox.AutoSize = true;
-            IonosphericCorrectionCheckBox.Dock = DockStyle.Fill;
-            IonosphericCorrectionCheckBox.Location = new Point(3, 79);
-            IonosphericCorrectionCheckBox.Name = "IonosphericCorrectionCheckBox";
-            IonosphericCorrectionCheckBox.Size = new Size(377, 32);
-            IonosphericCorrectionCheckBox.TabIndex = 4;
-            IonosphericCorrectionCheckBox.Text = "Ионосферная коррекция";
-            IonosphericCorrectionCheckBox.UseVisualStyleBackColor = true;
+            tableLayoutPanel13.ColumnCount = 1;
+            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel13.Controls.Add(RelativicCorrectionCheckBox, 0, 3);
+            tableLayoutPanel13.Controls.Add(IonosphericCorrectionCheckBox, 0, 2);
+            tableLayoutPanel13.Controls.Add(TroposphericCorrection, 0, 1);
+            tableLayoutPanel13.Controls.Add(tableLayoutPanel14, 0, 0);
+            tableLayoutPanel13.Dock = DockStyle.Fill;
+            tableLayoutPanel13.Location = new Point(3, 19);
+            tableLayoutPanel13.Name = "tableLayoutPanel13";
+            tableLayoutPanel13.RowCount = 5;
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 15F));
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 15F));
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 15F));
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 15F));
+            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
+            tableLayoutPanel13.Size = new Size(383, 259);
+            tableLayoutPanel13.TabIndex = 6;
             // 
             // RelativicCorrectionCheckBox
             // 
@@ -634,15 +647,43 @@
             RelativicCorrectionCheckBox.Text = "Релятивийская коррекция";
             RelativicCorrectionCheckBox.UseVisualStyleBackColor = true;
             // 
-            // MinSateliteAngleLabel
+            // IonosphericCorrectionCheckBox
             // 
-            MinSateliteAngleLabel.Anchor = AnchorStyles.Left;
-            MinSateliteAngleLabel.AutoSize = true;
-            MinSateliteAngleLabel.Location = new Point(3, 8);
-            MinSateliteAngleLabel.Name = "MinSateliteAngleLabel";
-            MinSateliteAngleLabel.Size = new Size(180, 15);
-            MinSateliteAngleLabel.TabIndex = 1;
-            MinSateliteAngleLabel.Text = "Минимальный угол места НКА";
+            IonosphericCorrectionCheckBox.AutoSize = true;
+            IonosphericCorrectionCheckBox.Dock = DockStyle.Fill;
+            IonosphericCorrectionCheckBox.Location = new Point(3, 79);
+            IonosphericCorrectionCheckBox.Name = "IonosphericCorrectionCheckBox";
+            IonosphericCorrectionCheckBox.Size = new Size(377, 32);
+            IonosphericCorrectionCheckBox.TabIndex = 4;
+            IonosphericCorrectionCheckBox.Text = "Ионосферная коррекция";
+            IonosphericCorrectionCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // TroposphericCorrection
+            // 
+            TroposphericCorrection.AutoSize = true;
+            TroposphericCorrection.Dock = DockStyle.Fill;
+            TroposphericCorrection.Location = new Point(3, 41);
+            TroposphericCorrection.Name = "TroposphericCorrection";
+            TroposphericCorrection.Size = new Size(377, 32);
+            TroposphericCorrection.TabIndex = 5;
+            TroposphericCorrection.Text = "Тропосферная коррекция";
+            TroposphericCorrection.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutPanel14
+            // 
+            tableLayoutPanel14.ColumnCount = 2;
+            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 82.49337F));
+            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17.5066319F));
+            tableLayoutPanel14.Controls.Add(minSateliteAngleUpDown, 1, 0);
+            tableLayoutPanel14.Controls.Add(MinSateliteAngleLabel, 0, 0);
+            tableLayoutPanel14.Dock = DockStyle.Fill;
+            tableLayoutPanel14.Location = new Point(3, 3);
+            tableLayoutPanel14.Name = "tableLayoutPanel14";
+            tableLayoutPanel14.RowCount = 1;
+            tableLayoutPanel14.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel14.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel14.Size = new Size(377, 32);
+            tableLayoutPanel14.TabIndex = 0;
             // 
             // minSateliteAngleUpDown
             // 
@@ -652,6 +693,16 @@
             minSateliteAngleUpDown.Name = "minSateliteAngleUpDown";
             minSateliteAngleUpDown.Size = new Size(60, 23);
             minSateliteAngleUpDown.TabIndex = 0;
+            // 
+            // MinSateliteAngleLabel
+            // 
+            MinSateliteAngleLabel.Anchor = AnchorStyles.Left;
+            MinSateliteAngleLabel.AutoSize = true;
+            MinSateliteAngleLabel.Location = new Point(3, 8);
+            MinSateliteAngleLabel.Name = "MinSateliteAngleLabel";
+            MinSateliteAngleLabel.Size = new Size(180, 15);
+            MinSateliteAngleLabel.TabIndex = 1;
+            MinSateliteAngleLabel.Text = "Минимальный угол места НКА";
             // 
             // GNSSGroupBox
             // 
@@ -663,6 +714,25 @@
             GNSSGroupBox.TabIndex = 0;
             GNSSGroupBox.TabStop = false;
             GNSSGroupBox.Text = "Спутниковые системы";
+            // 
+            // tableLayoutPanel12
+            // 
+            tableLayoutPanel12.ColumnCount = 3;
+            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel12.Controls.Add(BeidouCheckBox, 0, 1);
+            tableLayoutPanel12.Controls.Add(GalileoCheckBox, 2, 0);
+            tableLayoutPanel12.Controls.Add(GLONASSCheckBox, 1, 0);
+            tableLayoutPanel12.Controls.Add(GPSCheckbox, 0, 0);
+            tableLayoutPanel12.Dock = DockStyle.Fill;
+            tableLayoutPanel12.Location = new Point(3, 19);
+            tableLayoutPanel12.Name = "tableLayoutPanel12";
+            tableLayoutPanel12.RowCount = 2;
+            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel12.Size = new Size(383, 95);
+            tableLayoutPanel12.TabIndex = 5;
             // 
             // BeidouCheckBox
             // 
@@ -734,25 +804,33 @@
             GraphsSettingsGroupBox.TabStop = false;
             GraphsSettingsGroupBox.Text = "Параметры графиков";
             // 
-            // LineThicknessLabel
+            // tableLayoutPanel15
             // 
-            LineThicknessLabel.Anchor = AnchorStyles.None;
-            LineThicknessLabel.AutoSize = true;
-            LineThicknessLabel.Location = new Point(49, 8);
-            LineThicknessLabel.Name = "LineThicknessLabel";
-            LineThicknessLabel.Size = new Size(96, 15);
-            LineThicknessLabel.TabIndex = 5;
-            LineThicknessLabel.Text = "Толщина линии";
+            tableLayoutPanel15.ColumnCount = 2;
+            tableLayoutPanel15.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 49.9999962F));
+            tableLayoutPanel15.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50.0000076F));
+            tableLayoutPanel15.Controls.Add(PointSizeUpDown, 1, 1);
+            tableLayoutPanel15.Controls.Add(PointSizeLabel, 0, 1);
+            tableLayoutPanel15.Controls.Add(LineThicknessUpDown, 1, 0);
+            tableLayoutPanel15.Controls.Add(LineThicknessLabel, 0, 0);
+            tableLayoutPanel15.Dock = DockStyle.Fill;
+            tableLayoutPanel15.Location = new Point(3, 19);
+            tableLayoutPanel15.Name = "tableLayoutPanel15";
+            tableLayoutPanel15.RowCount = 3;
+            tableLayoutPanel15.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel15.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel15.RowStyles.Add(new RowStyle(SizeType.Percent, 60F));
+            tableLayoutPanel15.Size = new Size(391, 159);
+            tableLayoutPanel15.TabIndex = 6;
             // 
-            // LineThicknessUpDown
+            // PointSizeUpDown
             // 
-            LineThicknessUpDown.Increment = new decimal(new int[] { 5, 0, 0, 65536 });
-            LineThicknessUpDown.Location = new Point(198, 3);
-            LineThicknessUpDown.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
-            LineThicknessUpDown.Name = "LineThicknessUpDown";
-            LineThicknessUpDown.Size = new Size(44, 23);
-            LineThicknessUpDown.TabIndex = 4;
-            LineThicknessUpDown.Value = new decimal(new int[] { 5, 0, 0, 65536 });
+            PointSizeUpDown.Location = new Point(198, 34);
+            PointSizeUpDown.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            PointSizeUpDown.Name = "PointSizeUpDown";
+            PointSizeUpDown.Size = new Size(44, 23);
+            PointSizeUpDown.TabIndex = 2;
+            PointSizeUpDown.Value = new decimal(new int[] { 3, 0, 0, 0 });
             // 
             // PointSizeLabel
             // 
@@ -764,14 +842,25 @@
             PointSizeLabel.TabIndex = 3;
             PointSizeLabel.Text = "Размер точки";
             // 
-            // PointSizeUpDown
+            // LineThicknessUpDown
             // 
-            PointSizeUpDown.Location = new Point(198, 34);
-            PointSizeUpDown.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            PointSizeUpDown.Name = "PointSizeUpDown";
-            PointSizeUpDown.Size = new Size(44, 23);
-            PointSizeUpDown.TabIndex = 2;
-            PointSizeUpDown.Value = new decimal(new int[] { 3, 0, 0, 0 });
+            LineThicknessUpDown.Increment = new decimal(new int[] { 5, 0, 0, 65536 });
+            LineThicknessUpDown.Location = new Point(198, 3);
+            LineThicknessUpDown.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
+            LineThicknessUpDown.Name = "LineThicknessUpDown";
+            LineThicknessUpDown.Size = new Size(44, 23);
+            LineThicknessUpDown.TabIndex = 4;
+            LineThicknessUpDown.Value = new decimal(new int[] { 5, 0, 0, 65536 });
+            // 
+            // LineThicknessLabel
+            // 
+            LineThicknessLabel.Anchor = AnchorStyles.None;
+            LineThicknessLabel.AutoSize = true;
+            LineThicknessLabel.Location = new Point(49, 8);
+            LineThicknessLabel.Name = "LineThicknessLabel";
+            LineThicknessLabel.Size = new Size(96, 15);
+            LineThicknessLabel.TabIndex = 5;
+            LineThicknessLabel.Text = "Толщина линии";
             // 
             // PlotXYZCoordinatesButton
             // 
@@ -818,95 +907,6 @@
             LogTextBox.TabIndex = 1;
             LogTextBox.Text = "";
             // 
-            // tableLayoutPanel11
-            // 
-            tableLayoutPanel11.ColumnCount = 1;
-            tableLayoutPanel11.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel11.Controls.Add(CorrectionsGroupBox, 0, 1);
-            tableLayoutPanel11.Controls.Add(GNSSGroupBox, 0, 0);
-            tableLayoutPanel11.Dock = DockStyle.Fill;
-            tableLayoutPanel11.Location = new Point(3, 3);
-            tableLayoutPanel11.Name = "tableLayoutPanel11";
-            tableLayoutPanel11.RowCount = 2;
-            tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-            tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Percent, 70F));
-            tableLayoutPanel11.Size = new Size(395, 410);
-            tableLayoutPanel11.TabIndex = 2;
-            // 
-            // tableLayoutPanel12
-            // 
-            tableLayoutPanel12.ColumnCount = 3;
-            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-            tableLayoutPanel12.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3333321F));
-            tableLayoutPanel12.Controls.Add(BeidouCheckBox, 0, 1);
-            tableLayoutPanel12.Controls.Add(GalileoCheckBox, 2, 0);
-            tableLayoutPanel12.Controls.Add(GLONASSCheckBox, 1, 0);
-            tableLayoutPanel12.Controls.Add(GPSCheckbox, 0, 0);
-            tableLayoutPanel12.Dock = DockStyle.Fill;
-            tableLayoutPanel12.Location = new Point(3, 19);
-            tableLayoutPanel12.Name = "tableLayoutPanel12";
-            tableLayoutPanel12.RowCount = 2;
-            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel12.Size = new Size(383, 95);
-            tableLayoutPanel12.TabIndex = 5;
-            // 
-            // tableLayoutPanel13
-            // 
-            tableLayoutPanel13.ColumnCount = 1;
-            tableLayoutPanel13.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel13.Controls.Add(RelativicCorrectionCheckBox, 0, 3);
-            tableLayoutPanel13.Controls.Add(IonosphericCorrectionCheckBox, 0, 2);
-            tableLayoutPanel13.Controls.Add(TroposphericCorrection, 0, 1);
-            tableLayoutPanel13.Controls.Add(tableLayoutPanel14, 0, 0);
-            tableLayoutPanel13.Dock = DockStyle.Fill;
-            tableLayoutPanel13.Location = new Point(3, 19);
-            tableLayoutPanel13.Name = "tableLayoutPanel13";
-            tableLayoutPanel13.RowCount = 5;
-            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 15F));
-            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 15F));
-            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 15F));
-            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 15F));
-            tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
-            tableLayoutPanel13.Size = new Size(383, 259);
-            tableLayoutPanel13.TabIndex = 6;
-            // 
-            // tableLayoutPanel14
-            // 
-            tableLayoutPanel14.ColumnCount = 2;
-            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 82.49337F));
-            tableLayoutPanel14.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17.5066319F));
-            tableLayoutPanel14.Controls.Add(minSateliteAngleUpDown, 1, 0);
-            tableLayoutPanel14.Controls.Add(MinSateliteAngleLabel, 0, 0);
-            tableLayoutPanel14.Dock = DockStyle.Fill;
-            tableLayoutPanel14.Location = new Point(3, 3);
-            tableLayoutPanel14.Name = "tableLayoutPanel14";
-            tableLayoutPanel14.RowCount = 1;
-            tableLayoutPanel14.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel14.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel14.Size = new Size(377, 32);
-            tableLayoutPanel14.TabIndex = 0;
-            // 
-            // tableLayoutPanel15
-            // 
-            tableLayoutPanel15.ColumnCount = 2;
-            tableLayoutPanel15.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 49.9999962F));
-            tableLayoutPanel15.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50.0000076F));
-            tableLayoutPanel15.Controls.Add(PointSizeUpDown, 1, 1);
-            tableLayoutPanel15.Controls.Add(PointSizeLabel, 0, 1);
-            tableLayoutPanel15.Controls.Add(LineThicknessUpDown, 1, 0);
-            tableLayoutPanel15.Controls.Add(LineThicknessLabel, 0, 0);
-            tableLayoutPanel15.Dock = DockStyle.Fill;
-            tableLayoutPanel15.Location = new Point(3, 19);
-            tableLayoutPanel15.Name = "tableLayoutPanel15";
-            tableLayoutPanel15.RowCount = 3;
-            tableLayoutPanel15.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            tableLayoutPanel15.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            tableLayoutPanel15.RowStyles.Add(new RowStyle(SizeType.Percent, 60F));
-            tableLayoutPanel15.Size = new Size(391, 159);
-            tableLayoutPanel15.TabIndex = 6;
-            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -941,23 +941,23 @@
             tableLayoutPanel7.ResumeLayout(false);
             tableLayoutPanel7.PerformLayout();
             SettingsTab.ResumeLayout(false);
-            CorrectionsGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)minSateliteAngleUpDown).EndInit();
-            GNSSGroupBox.ResumeLayout(false);
-            GraphTab.ResumeLayout(false);
-            GraphsSettingsGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)LineThicknessUpDown).EndInit();
-            ((System.ComponentModel.ISupportInitialize)PointSizeUpDown).EndInit();
-            WindowLayoutPanel.ResumeLayout(false);
             tableLayoutPanel11.ResumeLayout(false);
-            tableLayoutPanel12.ResumeLayout(false);
-            tableLayoutPanel12.PerformLayout();
+            CorrectionsGroupBox.ResumeLayout(false);
             tableLayoutPanel13.ResumeLayout(false);
             tableLayoutPanel13.PerformLayout();
             tableLayoutPanel14.ResumeLayout(false);
             tableLayoutPanel14.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)minSateliteAngleUpDown).EndInit();
+            GNSSGroupBox.ResumeLayout(false);
+            tableLayoutPanel12.ResumeLayout(false);
+            tableLayoutPanel12.PerformLayout();
+            GraphTab.ResumeLayout(false);
+            GraphsSettingsGroupBox.ResumeLayout(false);
             tableLayoutPanel15.ResumeLayout(false);
             tableLayoutPanel15.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)PointSizeUpDown).EndInit();
+            ((System.ComponentModel.ISupportInitialize)LineThicknessUpDown).EndInit();
+            WindowLayoutPanel.ResumeLayout(false);
             ResumeLayout(false);
         }
 

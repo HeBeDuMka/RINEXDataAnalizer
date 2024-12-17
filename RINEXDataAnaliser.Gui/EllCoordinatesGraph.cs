@@ -40,7 +40,8 @@ namespace RINEXDataAnaliser.Gui
             }
 
             var sp = EllCoordinatesPlot.Plot.Add.Scatter(lat, lon);
-            EllCoordinatesPlot.Plot.Title("Координаты приемника в геоцентрической системе координат");
+            EllCoordinatesPlot.Plot.XLabel("Долгота, град");
+            EllCoordinatesPlot.Plot.YLabel("Широта, град");
             sp.LineWidth = LineThickness;
             sp.MarkerSize = pointSize;
         }

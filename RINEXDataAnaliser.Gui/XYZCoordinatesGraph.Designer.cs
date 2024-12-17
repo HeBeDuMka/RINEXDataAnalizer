@@ -28,52 +28,54 @@
         /// </summary>
         private void InitializeComponent()
         {
-            ReciverXCoordinate = new ScottPlot.WinForms.FormsPlot();
             ReciverYCoordinate = new ScottPlot.WinForms.FormsPlot();
             ReciverZCoordinate = new ScottPlot.WinForms.FormsPlot();
+            ReciverXCoordinate = new ScottPlot.WinForms.FormsPlot();
             SuspendLayout();
-            // 
-            // ReciverXCoordinate
-            // 
-            ReciverXCoordinate.DisplayScale = 1F;
-            ReciverXCoordinate.Location = new Point(12, 12);
-            ReciverXCoordinate.Name = "ReciverXCoordinate";
-            ReciverXCoordinate.Size = new Size(760, 177);
-            ReciverXCoordinate.TabIndex = 0;
             // 
             // ReciverYCoordinate
             // 
+            ReciverYCoordinate.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             ReciverYCoordinate.DisplayScale = 1F;
-            ReciverYCoordinate.Location = new Point(12, 195);
+            ReciverYCoordinate.Location = new Point(0, 0);
             ReciverYCoordinate.Name = "ReciverYCoordinate";
-            ReciverYCoordinate.Size = new Size(760, 177);
+            ReciverYCoordinate.Size = new Size(784, 177);
             ReciverYCoordinate.TabIndex = 1;
             // 
             // ReciverZCoordinate
             // 
+            ReciverZCoordinate.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             ReciverZCoordinate.DisplayScale = 1F;
-            ReciverZCoordinate.Location = new Point(12, 378);
+            ReciverZCoordinate.Location = new Point(0, 177);
             ReciverZCoordinate.Name = "ReciverZCoordinate";
-            ReciverZCoordinate.Size = new Size(760, 177);
+            ReciverZCoordinate.Size = new Size(784, 177);
             ReciverZCoordinate.TabIndex = 2;
             // 
-            // Form1
+            // ReciverXCoordinate
+            // 
+            ReciverXCoordinate.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ReciverXCoordinate.DisplayScale = 1F;
+            ReciverXCoordinate.Location = new Point(0, 354);
+            ReciverXCoordinate.Name = "ReciverXCoordinate";
+            ReciverXCoordinate.Size = new Size(784, 177);
+            ReciverXCoordinate.TabIndex = 0;
+            // 
+            // XYZCoordinatesGraph
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(784, 561);
+            Controls.Add(ReciverXCoordinate);
             Controls.Add(ReciverZCoordinate);
             Controls.Add(ReciverYCoordinate);
-            Controls.Add(ReciverXCoordinate);
-            Name = "Form1";
-            Text = "Form1";
+            Name = "XYZCoordinatesGraph";
+            Text = "Координаты приемника в геоцентрической системе координат";
             ResumeLayout(false);
         }
 
         #endregion
-
-        private ScottPlot.WinForms.FormsPlot ReciverXCoordinate;
         private ScottPlot.WinForms.FormsPlot ReciverYCoordinate;
         private ScottPlot.WinForms.FormsPlot ReciverZCoordinate;
+        private ScottPlot.WinForms.FormsPlot ReciverXCoordinate;
     }
 }

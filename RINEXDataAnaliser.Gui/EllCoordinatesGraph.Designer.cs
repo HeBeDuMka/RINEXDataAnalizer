@@ -34,10 +34,11 @@
             // EllCoordinatesPlot
             // 
             EllCoordinatesPlot.DisplayScale = 1F;
-            EllCoordinatesPlot.Location = new Point(12, 12);
+            EllCoordinatesPlot.Dock = DockStyle.Fill;
+            EllCoordinatesPlot.Location = new Point(0, 0);
             EllCoordinatesPlot.Margin = new Padding(0);
             EllCoordinatesPlot.Name = "EllCoordinatesPlot";
-            EllCoordinatesPlot.Size = new Size(460, 437);
+            EllCoordinatesPlot.Size = new Size(484, 461);
             EllCoordinatesPlot.TabIndex = 0;
             // 
             // EllCoordinatesGraph
@@ -47,7 +48,7 @@
             ClientSize = new Size(484, 461);
             Controls.Add(EllCoordinatesPlot);
             Name = "EllCoordinatesGraph";
-            Text = "EllCoordinatesGraph";
+            Text = "Координаты приемника в геодезической системе координат";
             ResumeLayout(false);
         }
 

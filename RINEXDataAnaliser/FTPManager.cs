@@ -215,5 +215,43 @@ namespace RINEXDataAnaliser
                 Console.WriteLine($"Ошибка при загрузке: {ex.Message}");
             }
         }
+
+        public List<string> GetObsFilePathByDate(DateTime dateTimeStart, DateTime dateTimeEnd)
+        {
+            List<string> fileNames = new();
+
+            TimeSpan deltaTimeObs = dateTimeEnd - dateTimeStart;
+
+            for (var iterDateTime = dateTimeStart; iterDateTime < dateTimeEnd; iterDateTime += new TimeSpan(1, 0, 0))
+            {
+                fileNames.Add($"SU5200RUS_R_{iterDateTime.Year}{iterDateTime.DayOfYear}{iterDateTime.Hour.ToString().PadLeft(2, '0')}00_01H_01S_MO.crx.gz");
+            }
+
+            return fileNames;
+        }
+
+        public List<string> GetNavFilesPathByDate(DateTime dateTimeStart, DateTime dateTimeEnd)
+        {
+            List<string> fileNames = new();
+            TimeSpan deltaTimeObs = dateTimeEnd - dateTimeStart;
+
+            for (var iterDateTime = dateTimeStart; iterDateTime < dateTimeEnd; iterDateTime += new TimeSpan(1, 0, 0, 0))
+            {
+                fileNames.Add($"Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}n");
+                fileNames.Add($"Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}g");
+                fileNames.Add($"Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}l");
+                fileNames.Add($"Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}f");
+            }
+
+            if (dateTimeEnd.DayOfYear != dateTimeStart.DayOfYear)
+            {
+                fileNames.Add($"Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}n");
+                fileNames.Add($"Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}g");
+                fileNames.Add($"Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}l");
+                fileNames.Add($"Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}f");
+            }
+
+            return fileNames;
+        }
     }
 }

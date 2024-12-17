@@ -13,7 +13,7 @@ using System.Runtime.Serialization.Formatters;
 namespace RINEXDataAnaliser
 {
     [Flags]
-    public enum CalcOptions
+    public enum GNSSSystem
     {
         None = 0,
         GPS = 0b00000001,
@@ -21,12 +21,6 @@ namespace RINEXDataAnaliser
         GALILEO = 0b00000100,
         BEIDOU = 0b00001000
     }
-    public enum GNSSSystem
-    {
-        GPS,
-        GLONASS,
-        GALILEO,
-        BEIDOU
     }
 
     public class CalcEpoch
@@ -278,7 +272,7 @@ namespace RINEXDataAnaliser
                 {
                     SatData satData = new();
 
-                    if (sateliteNumber.StartsWith("G") && ((calcOptions & CalcOptions.GPS) == CalcOptions.GPS))
+                    if (sateliteNumber.StartsWith("G") && ((calcOptions & GNSSSystem.GPS) == GNSSSystem.GPS))
                     {
                         RINEXNavGPSData gpsEpoch = navGPSFile.findNeedEpoch(sateliteNumber, reciverEpohData.epochTime);
 
@@ -304,7 +298,7 @@ namespace RINEXDataAnaliser
                             satelitesData.Add(sateliteNumber, satData);
                         }
                     }
-                    else if (sateliteNumber.StartsWith("R") && ((calcOptions & CalcOptions.GLONASS) == CalcOptions.GLONASS))
+                    else if (sateliteNumber.StartsWith("R") && ((calcOptions & GNSSSystem.GLONASS) == GNSSSystem.GLONASS))
                     {
                         RINEXNavGLONASSData gloEpoch = navGLONASSFile.findNeedEpoch(sateliteNumber, reciverEpohData.epochTime);
 
@@ -330,7 +324,7 @@ namespace RINEXDataAnaliser
                             satelitesData.Add(sateliteNumber, satData);
                         }
                     }
-                    else if (sateliteNumber.StartsWith("E") && ((calcOptions & CalcOptions.GALILEO) == CalcOptions.GALILEO))
+                    else if (sateliteNumber.StartsWith("E") && ((calcOptions & GNSSSystem.GALILEO) == GNSSSystem.GALILEO))
                     {
                         RINEXNavGALILEOData galEpoch = navGALILEOFile.findNeedEpoch(sateliteNumber, reciverEpohData.epochTime);
 

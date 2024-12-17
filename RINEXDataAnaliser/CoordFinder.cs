@@ -59,36 +59,78 @@ namespace RINEXDataAnaliser
         /// <param name="_az">Ускорение спутника по оси z из эфемерид</param>
         /// <param name="dt"></param>
         /// <returns></returns>
-        public static XYZCoordinates CalcGLONASSSateliteCoordinates(double _x, double _y, double _z, double _vx, double _vy, double _vz, double _ax, double _ay, double _az, double dt)
+        public static XYZCoordinates CalcGLONASSSateliteCoordinates(double _x, double _y, double _z, double _vx, double _vy, double _vz, double _ax, double _ay, double _az,
+            double clockBias, double frequencyBias, double tow, double toe, double pRangeL1, double pRangeL2, bool useRelativeDelay, bool useIonoDelay,
+            bool useTropoDelay, GNSSSystem gnssSystem, string f1BandName, string f2BandName)
         {
             double x, y, z, vx, vy, vz, ax, ay, az;
 
-            x = _x * 1e3;
-            y = _y * 1e3;
-            z = _z * 1e3;
-            vx = _vx * 1e3;
-            vy = _vy * 1e3;
-            vz = _vz * 1e3;
-            ax = _ax * 1e3;
-            ay = _ay * 1e3;
-            az = _az * 1e3;
+            x = _x;
+            y = _y;
+            z = _z;
+            vx = _vx;
+            vy = _vy;
+            vz = _vz;
+            ax = _ax;
+            ay = _ay;
+            az = _az;
 
-            double k1dx, k1dy, k1dz, k1dvx, k1dvy, k1dvz;
-            double k2dx, k2dy, k2dz, k2dvx, k2dvy, k2dvz;
-            double k3dx, k3dy, k3dz, k3dvx, k3dvy, k3dvz;
-            double k4dx, k4dy, k4dz, k4dvx, k4dvy, k4dvz;
+            double pDelay;
+            if (useIonoDelay)
+            {
+                double f1sq, f2sq, f1, f2;
+                (f1, f2) = FrequencyManager.getTwoFreq(gnssSystem, f1BandName, f2BandName);
+                f1sq = Math.Pow(f1, 2);
+                f2sq = Math.Pow(f2, 2);
+                pDelay = ((f1sq * pRangeL1 - f2sq * pRangeL2) / (f1sq - f2sq)) / speedOfLight;
+            }
+            else
+            {
+                pDelay = pRangeL1 / speedOfLight;
+            }
 
-            (k1dx, k1dy, k1dz, k1dvx, k1dvy, k1dvz) = glonassSatelliteMotion(x, y, z, vx, vy, vz, ax, ay, az);
-            (k2dx, k2dy, k2dz, k2dvx, k2dvy, k2dvz) = glonassSatelliteMotion(x + k1dx * dt / 2, y + k1dy * dt / 2, z + k1dz * dt / 2, vx + k1dvx * dt / 2, vy + k1dvy * dt / 2, vz + k1dvz * dt / 2, ax, ay, az);
-            (k3dx, k3dy, k3dz, k3dvx, k3dvy, k3dvz) = glonassSatelliteMotion(x + k2dx * dt / 2, y + k2dy * dt / 2, z + k2dz * dt / 2, vx + k2dvx * dt / 2, vy + k2dvy * dt / 2, vz + k2dvz * dt / 2, ax, ay, az);
-            (k4dx, k4dy, k4dz, k4dvx, k4dvy, k4dvz) = glonassSatelliteMotion(x + k3dx * dt, y + k3dy * dt, z + k3dz * dt, vx + k3dvx * dt, vy + k3dvy * dt, vz + k3dvz * dt, ax, ay, az);
+            double Tj = (tow - pDelay) % 86400;
 
-            x = x + (dt / 6) * (k1dx + 2 * k2dx + 2 * k3dx + k4dx);
-            y = y + (dt / 6) * (k1dy + 2 * k2dy + 2 * k3dy + k4dy);
-            z = z + (dt / 6) * (k1dz + 2 * k2dz + 2 * k3dz + k4dz);
-            vx = vx + (dt / 6) * (k1dvx + 2 * k2dvx + 2 * k3dvx + k4dvx);
-            vy = vy + (dt / 6) * (k1dvy + 2 * k2dvy + 2 * k3dvy + k4dvy);
-            vz = vz + (dt / 6) * (k1dvz + 2 * k2dvz + 2 * k3dvz + k4dvz);
+            double dt = Tj + clockBias - frequencyBias * (Tj - toe);
+            if (dt < 0)
+            {
+                dt += 86400;
+            }
+
+            double h;
+            if (dt > tow)
+            {
+                h = -1;
+            }
+            else
+            {
+                h = 1;
+            }
+
+            int i = 0;
+            DenseVector s = DenseVector.OfArray([x, y, z, vx, vy, vz]), ds;
+            while (Math.Abs(i * h) < Math.Abs(dt - (tow % 86400) + h))
+            {
+                var arg = s;
+                var k1 = h * glonassSatelliteMotion(arg, ax, ay, az);
+                arg = s + 0.5 * k1;
+                var k2 = h * glonassSatelliteMotion(arg, ax, ay, az);
+                arg = s + 0.5 * k2;
+                var k3 = h * glonassSatelliteMotion(arg, ax, ay, az);
+                arg = s + 0.5 * k3;
+                var k4 = h * glonassSatelliteMotion(arg, ax, ay, az);
+                ds = (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+                s += ds;
+
+                i++;
+            }
+
+            x = s[0];
+            y = s[1];
+            z = s[2];
+            vx = s[3];
+            vy = s[4];
+            vz = s[5];
 
             return new XYZCoordinates(x, y, z);
         }
@@ -106,24 +148,32 @@ namespace RINEXDataAnaliser
         /// <param name="ay">Ускорение спутника по оси y из эфемерид</param>
         /// <param name="az">Ускорение спутника по оси z из эфемерид</param>
         /// <returns></returns>
-        private static (double, double, double, double, double, double) glonassSatelliteMotion(double x, double y, double z,
-            double vx, double vy, double vz, double ax, double ay, double az)
+        private static DenseVector glonassSatelliteMotion(DenseVector arg, double ax, double ay, double az)
         {
+            double x, y, z, vx, vy, vz;
+            x = arg[0];
+            y = arg[1];
+            z = arg[2];
+            vx = arg[3];
+            vy = arg[4];
+            vz = arg[5];
+
             double mu = 3.9860044e14;
-            double ae = 6378136;
-            double J02 = 1082625.7e-9;
+            double R = 6378136;
+            double C20 = -1082.62e-6;
             double OmegaEDot = 7.292115e-5;
             double r = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2) + Math.Pow(z, 2));
+            double A = mu / Math.Pow(r, 3);
 
             double dx = vx;
             double dy = vy;
             double dz = vz;
 
-            double dvx = -mu / Math.Pow(r, 3) * x - 1.5 * Math.Pow(J02, 2) * (mu * Math.Pow(ae, 2)) / Math.Pow(r, 5) * x * (1 - 5 * Math.Pow(z, 2) / Math.Pow(r, 2)) + Math.Pow(OmegaEDot, 2) * x + 2 * OmegaEDot * vy + ax;
-            double dvy = -mu / Math.Pow(r, 3) * y - 1.5 * Math.Pow(J02, 2) * (mu * Math.Pow(ae, 2)) / Math.Pow(r, 5) * y * (1 - 5 * Math.Pow(z, 2) / Math.Pow(r, 2)) + Math.Pow(OmegaEDot, 2) * y + 2 * OmegaEDot * vx + ay;
-            double dvz = -mu / Math.Pow(r, 3) * z - 1.5 * Math.Pow(J02, 2) * (mu * Math.Pow(ae, 2)) / Math.Pow(r, 5) * z * (1 - 5 * Math.Pow(z, 2) / Math.Pow(r, 2)) + az;
+            double dvx = (Math.Pow(OmegaEDot, 2) - A) * x + 2 * omegaDotE * vz + 1.5 * C20 * ((mu * Math.Pow(R, 2)) / Math.Pow(r, 5)) * x * (1 - ((5 * Math.Pow(z, 2)) / Math.Pow(r, 2))) + ax;
+            double dvy = (Math.Pow(OmegaEDot, 2) - A) * y + 2 * omegaDotE * vy + 1.5 * C20 * ((mu * Math.Pow(R, 2)) / Math.Pow(r, 5)) * y * (1 - ((5 * Math.Pow(z, 2)) / Math.Pow(r, 2))) + ay;
+            double dvz = - A * z + 1.5 * C20 * ((mu * Math.Pow(R, 2)) / Math.Pow(r, 5)) * z * (1 - ((5 * Math.Pow(z, 2)) / Math.Pow(r, 2))) + az;
 
-            return (dx, dy, dz, dvx, dvy, dvz);
+            return DenseVector.OfArray([dx, dy, dz, dvx, dvy, dvz]);
         }
 
         #endregion
@@ -241,16 +291,31 @@ namespace RINEXDataAnaliser
             r = Math.Pow(sqrtA, 2) * (1 - ecc * Math.Cos(Ek2)) + dr;
             i = i0 + di + iDot * tk;
 
-            // Формула 1.78
-            Omega = Omega0 + (omegaDot - omegaE) * tk - omegaE * t0e;
+            if (gnssSystem == GNSSSystem.BEIDOU)
+            {
+                Omega = Omega0 + omegaDot * tk - omegaE * t0e;
+                xo = r * Math.Cos(u);
+                yo = r * Math.Sin(u);
+                double xg, yg, zg;
+                xg = xo * Math.Cos(Omega) - yo * Math.Sin(Omega) * Math.Cos(i);
+                yg = xo * Math.Sin(Omega) + yo * Math.Cos(Omega) * Math.Cos(i);
+                zg = yo * Math.Sin(i);
+                x = xg * Math.Cos(Omega) + yg * Math.Sin(Omega) * Math.Cos(-5) + zg * Math.Sin(Omega) * Math.Sin(-5);
+                y = -xg * Math.Sin(Omega) + yg * Math.Cos(Omega) * Math.Cos(-5) + zg * Math.Cos(Omega) * Math.Sin(-5);
+                z = -yg * Math.Sin(-5) + zg * Math.Cos(-5);
+            }
+            else
+            {
+                // Формула 1.78
+                Omega = Omega0 + (omegaDot - omegaE) * tk - omegaE * t0e;
 
             // Формула 1.79
             xo = r * Math.Cos(u);
             yo = r * Math.Sin(u);
-            x = xo * Math.Cos(Omega) - yo * Math.Sin(Omega) * Math.Cos(i);
-            y = xo * Math.Sin(Omega) + yo * Math.Cos(Omega) * Math.Cos(i);
-            z = yo * Math.Sin(i);
-
+                x = xo * Math.Cos(Omega) - yo * Math.Sin(Omega) * Math.Cos(i);
+                y = xo * Math.Sin(Omega) + yo * Math.Cos(Omega) * Math.Cos(i);
+                z = yo * Math.Sin(i);
+            }
             return (new XYZCoordinates(x ,y, z), dTj);
         }
 
@@ -306,17 +371,15 @@ namespace RINEXDataAnaliser
                         {
                             //double timeR = epochData.epochTime.Hour * 3600 + epochData.epochTime.Minute * 60 + epochData.epochTime.Second;
                             //double timeK = timeR - sateliteData.pseudoranges["C1C"].value / speedOfLight;
-                            double obsWeekNumber, tow, navWeekNumber, t0e, tk1, tk, dtk;
-                            const double tauSys = -1.87661499e-7;
+                            double obsWeekNumber, tow, navWeekNumber, tb, tk;
                             (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GLONASS, reciverEpohData.epochTime);
-                            (navWeekNumber, t0e) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GLONASS, gloEpoch.epochTime);
-                            tk1 = tow - sateliteData.pseudoranges["C1C"].value / speedOfLight;
-                            dtk = tauSys + gloEpoch.clockBias - gloEpoch.frequencyBias * (tk1 - t0e);
-                            tk = tk1 + dtk - t0e;
+                            (navWeekNumber, tb) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GLONASS, gloEpoch.epochTime);
 
                             satData.coordinates = CalcGLONASSSateliteCoordinates(gloEpoch.satelitePos.X, gloEpoch.satelitePos.Y, gloEpoch.satelitePos.Z,
                                 gloEpoch.sateliteVelocity.X, gloEpoch.sateliteVelocity.Y, gloEpoch.sateliteVelocity.Z,
-                                gloEpoch.sateliteAcceleration.X, gloEpoch.sateliteAcceleration.Y, gloEpoch.sateliteAcceleration.Z, tk);
+                                gloEpoch.sateliteAcceleration.X, gloEpoch.sateliteAcceleration.Y, gloEpoch.sateliteAcceleration.Z, gloEpoch.clockBias,
+                                gloEpoch.frequencyBias, tow, tb, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C1")).First().Value.value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C2")).First().Value.value,
+                                useRelativeCorr, useIonoDelayCorr, useTropoDelayCorr, GNSSSystem.GLONASS, "G1", "G2");
 
                             satData.pseudoranges = sateliteData.pseudoranges;
                             satData.pseudophases = sateliteData.pseudophases;

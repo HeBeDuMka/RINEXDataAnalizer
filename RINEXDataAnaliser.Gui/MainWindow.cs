@@ -9,6 +9,7 @@ namespace RINEXDataAnaliser.Gui
         RINEXNavGALILEOFile galileoNavFile = new();
         RINEXNavGLONASSFile glonassNavFile = new();
         RINEXNavGPSFile gpsNavFile = new();
+        RINEXNavBeidouFile beidouFile = new();
         RINEXObsFile obsFile = new();
         RegexManager regexManager = new();
         List<CalcEpoch> satelitesCoordsAndPseudoranges = new();
@@ -52,6 +53,8 @@ namespace RINEXDataAnaliser.Gui
                 if (fileDialog.FileName.EndsWith("f"))
                 {
                     BeidouCheckBox.Enabled = true;
+                    BeidouCheckBox.Checked = true;
+                    beidouFile.ParceFile(fileDialog.FileName, regexManager);
                 }
                 else if (fileDialog.FileName.EndsWith("g"))
                 {
@@ -89,25 +92,25 @@ namespace RINEXDataAnaliser.Gui
 
         private void CalculateButton_Click(object sender, EventArgs e)
         {
-            var calculationOptions = CalcOptions.None;
+            var calculationOptions = GNSSSystem.None;
             if (GPSCheckbox.Checked)
             {
-                calculationOptions |= CalcOptions.GPS;
+                calculationOptions |= GNSSSystem.GPS;
             }
             if (GalileoCheckBox.Checked)
             {
-                calculationOptions |= CalcOptions.GALILEO;
+                calculationOptions |= GNSSSystem.GALILEO;
             }
             if (GLONASSCheckBox.Checked)
             {
-                calculationOptions |= CalcOptions.GLONASS;
+                calculationOptions |= GNSSSystem.GLONASS;
             }
             if (BeidouCheckBox.Checked)
             {
-                calculationOptions |= CalcOptions.BEIDOU;
+                calculationOptions |= GNSSSystem.BEIDOU;
             }
 
-            satelitesCoordsAndPseudoranges = CoordFinder.FindSateliteCoord(obsFile, gpsNavFile, glonassNavFile, galileoNavFile, calculationOptions,
+            satelitesCoordsAndPseudoranges = CoordFinder.FindSateliteCoord(obsFile, gpsNavFile, glonassNavFile, galileoNavFile, beidouFile, calculationOptions,
                 RelativicCorrectionCheckBox.Checked, IonosphericCorrectionCheckBox.Checked, TroposphericCorrection.Checked);
             reciverCoordinates = CoordFinder.FindReciverCoordinates(satelitesCoordsAndPseudoranges, true, Convert.ToDouble(minSateliteAngleUpDown.Value));
         }

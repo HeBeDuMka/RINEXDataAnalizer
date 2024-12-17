@@ -262,7 +262,8 @@ namespace RINEXDataAnaliser
 
         #endregion
 
-        public static List<CalcEpoch> FindSateliteCoord(RINEXObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, RINEXNavGALILEOFile navGALILEOFile, CalcOptions calcOptions,
+        public static List<CalcEpoch> FindSateliteCoord(RINEXObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, RINEXNavGALILEOFile navGALILEOFile,
+            RINEXNavBeidouFile navBeidouFile, GNSSSystem calcOptions,
             bool useRelativeCorr, bool useIonoDelayCorr, bool useTropoDelayCorr)
         {
             List<CalcEpoch> calcEpoches = new();
@@ -346,6 +347,32 @@ namespace RINEXDataAnaliser
                                 galEpoch.i0, galEpoch.iDot, galEpoch.omega0, galEpoch.omegaDot, galEpoch.ttoe, galEpoch.ttoe, galEpoch.ttoe,
                                 tow, sateliteData.pseudoranges["C1C"].value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C5")).First().Value.value,
                                 af0, af1, af2, useRelativeCorr, useIonoDelayCorr, useTropoDelayCorr, GNSSSystem.GALILEO, "E1", "E5a");
+
+                            satData.coordinates = coordinates;
+                            satData.pseudoranges = sateliteData.pseudoranges;
+                            satData.pseudophases = sateliteData.pseudophases;
+                            satData.deltaSysTime = dtsv;
+
+                            satelitesData.Add(sateliteNumber, satData);
+                        }
+                    }
+                    else if (sateliteNumber.StartsWith("C") && ((calcOptions & GNSSSystem.BEIDOU) == GNSSSystem.BEIDOU))
+                    {
+                        RINEXNavBeidouData bdsEpoch = navBeidouFile.findNeedEpoch(sateliteNumber, reciverEpohData.epochTime);
+
+                        if (bdsEpoch != null)
+                        {
+                            XYZCoordinates coordinates;
+                            double tow, dtsv;
+                            double af0 = bdsEpoch.clockBias, af1 = bdsEpoch.clockDrift, af2 = bdsEpoch.clockDriftRate;
+                            // Время приемника в системе времени GPS
+                            (_, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.BEIDOU, reciverEpohData.epochTime);
+
+                            (coordinates, dtsv) = CalcGalileoGpsBeidousateliteCoordinates(bdsEpoch.sqrtA, bdsEpoch.deltaN, bdsEpoch.m0, bdsEpoch.e,
+                                bdsEpoch.omega, bdsEpoch.cus, bdsEpoch.cuc, bdsEpoch.crs, bdsEpoch.crc, bdsEpoch.cis, bdsEpoch.cic,
+                                bdsEpoch.i0, bdsEpoch.iDot, bdsEpoch.omega0, bdsEpoch.omegaDot, bdsEpoch.ttoe, bdsEpoch.ttoe, bdsEpoch.tgd1,
+                                tow, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C1")).First().Value.value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C5")).First().Value.value,
+                                af0, af1, af2, useRelativeCorr, useIonoDelayCorr, useTropoDelayCorr, GNSSSystem.BEIDOU, "B1", "B2");
 
                             satData.coordinates = coordinates;
                             satData.pseudoranges = sateliteData.pseudoranges;
@@ -489,7 +516,16 @@ namespace RINEXDataAnaliser
                         {
                             B.Add(1);
                         }
-                        Es.Add(sateliteData.pseudoranges["C1C"].value + speedOfLight * sateliteData.deltaSysTime - distance - dt);
+
+                        if (sateliteNumber.StartsWith("C") || sateliteNumber.StartsWith("E") || sateliteNumber.StartsWith("G"))
+                        {
+                            Es.Add(sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C1")).First().Value.value + speedOfLight * sateliteData.deltaSysTime - distance - dt);
+                        }
+                        else if (sateliteNumber.StartsWith("R"))
+                        {
+                            Es.Add(sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C1")).First().Value.value - speedOfLight * sateliteData.deltaSysTime - distance - dt);
+                        }
+
                         lineNumber++;
                     }
                 }

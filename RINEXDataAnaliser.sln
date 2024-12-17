@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RINEXDataAnaliser", "RINEXD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RINEXDataAnaliser.Tests", "RINEXDataAnaliser.Tests\RINEXDataAnaliser.Tests.csproj", "{947F0FAF-0F9F-4528-92D2-AA17110B1BAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RINEXDataAnaliser.Gui", "RINEXDataAnaliser.Gui\RINEXDataAnaliser.Gui.csproj", "{DB719399-F6DD-4E3F-AB57-CB56765D8698}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RINEXDataAnaliser.Gui", "RINEXDataAnaliser.Gui\RINEXDataAnaliser.Gui.csproj", "{DB719399-F6DD-4E3F-AB57-CB56765D8698}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3F54725C-BA26-475C-A776-FC7849440973} = {3F54725C-BA26-475C-A776-FC7849440973}
 	EndProjectSection

@@ -20,25 +20,6 @@ namespace RINEXDataAnaliser.Gui
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void SelectObsFileButton_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Файлы наблюдений RINEX (*.rnx)|*.rnx|Все файлы (*.*)|*.*";
-            fileDialog.Title = "Выберите файл наблюдений";
-
-            // Если пользователь выбрал файл, отображаем путь
-            if (fileDialog.ShowDialog() == DialogResult.OK)
-            {
-                SelectObsFileTextBox.Text = $"{fileDialog.FileName}";
-                obsFile.ParseFile(fileDialog.FileName, regexManager);
-            }
-        }
-
         private void AddNavFileButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();

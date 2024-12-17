@@ -21,7 +21,6 @@ namespace RINEXDataAnaliser
         GALILEO = 0b00000100,
         BEIDOU = 0b00001000
     }
-    }
 
     public class CalcEpoch
     {
@@ -309,9 +308,9 @@ namespace RINEXDataAnaliser
                 // Формула 1.78
                 Omega = Omega0 + (omegaDot - omegaE) * tk - omegaE * t0e;
 
-            // Формула 1.79
-            xo = r * Math.Cos(u);
-            yo = r * Math.Sin(u);
+                // Формула 1.79
+                xo = r * Math.Cos(u);
+                yo = r * Math.Sin(u);
                 x = xo * Math.Cos(Omega) - yo * Math.Sin(Omega) * Math.Cos(i);
                 y = xo * Math.Sin(Omega) + yo * Math.Cos(Omega) * Math.Cos(i);
                 z = yo * Math.Sin(i);
@@ -352,7 +351,7 @@ namespace RINEXDataAnaliser
                             (coordinates, dtsv) = CalcGalileoGpsBeidousateliteCoordinates(gpsEpoch.sqrtA, gpsEpoch.deltaN, gpsEpoch.m0, gpsEpoch.e,
                                 gpsEpoch.omega, gpsEpoch.cus, gpsEpoch.cuc, gpsEpoch.crs, gpsEpoch.crc, gpsEpoch.cis, gpsEpoch.cic,
                                 gpsEpoch.i0, gpsEpoch.iDot, gpsEpoch.omega0, gpsEpoch.omegaDot, gpsEpoch.ttoe, gpsEpoch.ttoe, gpsEpoch.tgd,
-                                tow, sateliteData.pseudoranges["C1C"].value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C2")).First().Value.value,
+                                tow, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C1")).First().Value.value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C2")).First().Value.value,
                                 af0, af1, af2, useRelativeCorr, useIonoDelayCorr, useTropoDelayCorr, GNSSSystem.GPS, "L1", "L2");
 
                             satData.coordinates = coordinates;
@@ -370,7 +369,7 @@ namespace RINEXDataAnaliser
                         if (gloEpoch != null)
                         {
                             //double timeR = epochData.epochTime.Hour * 3600 + epochData.epochTime.Minute * 60 + epochData.epochTime.Second;
-                            //double timeK = timeR - sateliteData.pseudoranges["C1C"].value / speedOfLight;
+                            //double timeK = timeR - sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C1")).First().Value.value / speedOfLight;
                             double obsWeekNumber, tow, navWeekNumber, tb, tk;
                             (obsWeekNumber, tow) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GLONASS, reciverEpohData.epochTime);
                             (navWeekNumber, tb) = GNSSTime.calcGNSSWeekandTow(GNSSSystem.GLONASS, gloEpoch.epochTime);
@@ -402,7 +401,7 @@ namespace RINEXDataAnaliser
                             (coordinates, dtsv) = CalcGalileoGpsBeidousateliteCoordinates(galEpoch.sqrtA, galEpoch.deltaN, galEpoch.m0, galEpoch.e,
                                 galEpoch.omega, galEpoch.cus, galEpoch.cuc, galEpoch.crs, galEpoch.crc, galEpoch.cis, galEpoch.cic,
                                 galEpoch.i0, galEpoch.iDot, galEpoch.omega0, galEpoch.omegaDot, galEpoch.ttoe, galEpoch.ttoe, galEpoch.ttoe,
-                                tow, sateliteData.pseudoranges["C1C"].value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C5")).First().Value.value,
+                                tow, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C1")).First().Value.value, sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C5")).First().Value.value,
                                 af0, af1, af2, useRelativeCorr, useIonoDelayCorr, useTropoDelayCorr, GNSSSystem.GALILEO, "E1", "E5a");
 
                             satData.coordinates = coordinates;
@@ -514,7 +513,7 @@ namespace RINEXDataAnaliser
                     Hs[lineNumber, 2] = (z - z_s) / distance;
                     Hs[lineNumber, 3] = 1;
 
-                    Es[lineNumber] = sateliteData.pseudoranges["C1C"].value + speedOfLight * sateliteData.deltaSysTime - distance - dt;
+                    Es[lineNumber] = sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C1")).First().Value.value + speedOfLight * sateliteData.deltaSysTime - distance - dt;
                     lineNumber++;
                 }
 
@@ -567,7 +566,7 @@ namespace RINEXDataAnaliser
 
                         if (useWeightMatrix)
                         {
-                            B.Add((1 - (sateliteData.pseudoranges["C1C"].SSI / 9.0)) * (1 - (sateliteAngles[sateliteNumber] / 90)));
+                            B.Add((1 - (sateliteData.pseudoranges.Where(kvp => kvp.Key.StartsWith("C5")).First().Value.SSI / 9.0)) * (1 - (sateliteAngles[sateliteNumber] / 90)));
                         }
                         else
                         {

@@ -1,6 +1,7 @@
 using System.Windows.Forms;
 using RINEXDataAnaliser;
 using RINEXDataAnaliser.DataStructures;
+using System.Diagnostics;
 
 namespace RINEXDataAnaliser.Gui
 {
@@ -29,7 +30,7 @@ namespace RINEXDataAnaliser.Gui
             // Если пользователь выбрал файл, отображаем путь
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
-                NavFilesListBox.Items.Add($"{fileDialog.FileName}");
+                DownloadedFilesListBox.Items.Add($"{fileDialog.FileName}");
 
                 if (fileDialog.FileName.EndsWith("f"))
                 {
@@ -60,9 +61,9 @@ namespace RINEXDataAnaliser.Gui
 
         private void DeleteNavFileButton_Click(object sender, EventArgs e)
         {
-            if (NavFilesListBox.SelectedItem != null)
+            if (DownloadedFilesListBox.SelectedItem != null)
             {
-                NavFilesListBox.Items.Remove(NavFilesListBox.SelectedItem);
+                DownloadedFilesListBox.Items.Remove(DownloadedFilesListBox.SelectedItem);
             }
         }
 
@@ -108,6 +109,85 @@ namespace RINEXDataAnaliser.Gui
             XYZCoordinatesGraph xyzCoordinatesGraph = new();
             xyzCoordinatesGraph.plotGraph(reciverCoordinates, Convert.ToInt32(PointSizeUpDown.Value), Convert.ToSingle(LineThicknessUpDown.Value), obsFile.header.approxPosition);
             xyzCoordinatesGraph.Show();
+        }
+
+        private void LoadButton_Click(object sender, EventArgs e)
+        {
+            FTPManager ftpObsManager = new(UserServerAdressTextBox.Text, UserServerLoginTextBox.Text,
+                UserServerPasswordTextBox.Text);
+            ftpObsManager.ChangeWorkingDir(UserServerDirectoryTextBox.Text);
+            FTPManager ftpNavManager = new(IacServerAdressTextBox.Text, "", "");
+            ftpNavManager.ChangeWorkingDir(IacServerDirectoryTextBox.Text);
+
+            List<string> navFilesNames = ftpNavManager.GetNavFilesPathByDate(ObsFileDateStartTimePicker.Value,
+                ObsFileDateEndTimePicker.Value);
+            List<string> obsFilesNames = ftpObsManager.GetObsFilesPathByDate(ObsFileDateStartTimePicker.Value,
+                ObsFileDateEndTimePicker.Value);
+
+            List<string> navDownloadedFilesNames = ftpNavManager.DownloadFiles(navFilesNames);
+            List<string> obsDownloadedFilesNames = ftpObsManager.DownloadFiles(obsFilesNames);
+            List<string> obsUnzipedFilesNames = new();
+
+            LogTextBox.AppendText($"Загружены файлы наблюдений\n");
+            foreach (var fileName in obsDownloadedFilesNames)
+            {
+                LogTextBox.AppendText($"{fileName}\n");
+            }
+            LogTextBox.AppendText("\n");
+
+            LogTextBox.AppendText($"Файлы наблюдений разархивированы\n");
+            foreach (var fileName in obsDownloadedFilesNames)
+            {
+                string tempFileName = Path.GetFileNameWithoutExtension(fileName);
+                string tempDirectoryName = Path.GetDirectoryName(fileName);
+                obsUnzipedFilesNames.Add(Path.Combine(tempDirectoryName, Path.GetFileNameWithoutExtension(tempFileName) + ".rnx"));
+                LogTextBox.AppendText($"{obsUnzipedFilesNames.Last()}\n");
+                DownloadedFilesListBox.Items.Add(obsUnzipedFilesNames.Last());
+
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = @".\CRZ2RNX.BAT", // Путь к программе
+                    Arguments = fileName, // Параметры командной строки
+                    UseShellExecute = false, // Не использовать оболочку Windows
+                    RedirectStandardOutput = true, // Перенаправить стандартный вывод (опционально)
+                    RedirectStandardError = true,  // Перенаправить ошибки (опционально)
+                    CreateNoWindow = true         // Не создавать окно консоли
+                };
+
+                try
+                {
+                    // Запуск процесса
+                    using (Process process = Process.Start(startInfo))
+                    {
+                        // Считываем стандартный вывод (если нужно)
+                        string output = process.StandardOutput.ReadToEnd();
+                        string error = process.StandardError.ReadToEnd();
+
+                        // Ждем завершения процесса
+                        process.WaitForExit();
+
+                        Console.WriteLine("Программа завершена.");
+                        Console.WriteLine($"Вывод программы: {output}");
+                        if (!string.IsNullOrEmpty(error))
+                        {
+                            Console.WriteLine($"Ошибки: {error}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при запуске программы: {ex.Message}");
+                }
+            }
+            LogTextBox.AppendText("\n");
+
+            LogTextBox.AppendText($"Загружены файлы эфемерид\n");
+            foreach (var fileName in navDownloadedFilesNames)
+            {
+                LogTextBox.AppendText($"{fileName}\n");
+                DownloadedFilesListBox.Items.Add(fileName);
+            }
+            LogTextBox.AppendText("\n");
         }
     }
 }

@@ -124,23 +124,31 @@ namespace RINEXDataAnaliser
         /// </summary>
         /// <param name="fileName">Имя файла для скачивания (из текущей рабочей директории)</param>
         /// <param name="localFilePath">Локальный путь к папке в которую будет сохранен файл</param>
-        public void DownloadFile(string fileName, string localFilePath)
+        public string DownloadFile(string fileName, string localFilePath)
         {
             try
             {
                 // Создаем объект FtpWebRequest для загрузки файла
-                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpUrl + curentWorkingDirectory + "/" + fileName);
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpUrl + curentWorkingDirectory + fileName);
                 request.Method = WebRequestMethods.Ftp.DownloadFile;
                 request.Credentials = new NetworkCredential(login, password);
                 request.UsePassive = true;
                 request.UseBinary = true;
                 request.KeepAlive = true;
                 request.Timeout = Timeout.Infinite;
+                // Получаем директорию из полного пути
+                string directoryPath = Path.GetDirectoryName(Path.Combine(localFilePath, fileName));
+
+                if (directoryPath != null)
+                {
+                    // Создаем директории, если их нет
+                    Directory.CreateDirectory(directoryPath);
+                }
 
                 // Получаем ответ от сервера
                 using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
                 using (Stream responseStream = response.GetResponseStream())
-                using (FileStream outputStream = new FileStream(localFilePath + "\\" + fileName, FileMode.Create))
+                using (FileStream outputStream = new FileStream(Path.Combine(localFilePath, fileName), FileMode.Create))
                 {
                     byte[] buffer = new byte[1024];
                     int bytesRead;
@@ -150,11 +158,13 @@ namespace RINEXDataAnaliser
                     }
                 }
 
-                Console.WriteLine($"Файл скачан: {localFilePath + "\\" + fileName}");
+                Console.WriteLine($"Файл скачан: {Path.Combine(localFilePath, fileName)}");
+                return Path.GetFullPath(Path.Combine(localFilePath, fileName));
             }
             catch (WebException ex)
             {
                 Console.WriteLine($"Ошибка при загрузке файла: {ex.Message}");
+                return "";
             }
         }
 
@@ -216,7 +226,7 @@ namespace RINEXDataAnaliser
             }
         }
 
-        public List<string> GetObsFilePathByDate(DateTime dateTimeStart, DateTime dateTimeEnd)
+        public List<string> GetObsFilesPathByDate(DateTime dateTimeStart, DateTime dateTimeEnd)
         {
             List<string> fileNames = new();
 
@@ -224,7 +234,7 @@ namespace RINEXDataAnaliser
 
             for (var iterDateTime = dateTimeStart; iterDateTime < dateTimeEnd; iterDateTime += new TimeSpan(1, 0, 0))
             {
-                fileNames.Add($"SU5200RUS_R_{iterDateTime.Year}{iterDateTime.DayOfYear}{iterDateTime.Hour.ToString().PadLeft(2, '0')}00_01H_01S_MO.crx.gz");
+                fileNames.Add($"{iterDateTime.Year}/{iterDateTime.Month.ToString().PadLeft(2, '0')}/SU5200RUS_R_{iterDateTime.Year}{iterDateTime.DayOfYear}{iterDateTime.Hour.ToString().PadLeft(2, '0')}00_01H_01S_MO.crx.gz");
             }
 
             return fileNames;
@@ -237,21 +247,34 @@ namespace RINEXDataAnaliser
 
             for (var iterDateTime = dateTimeStart; iterDateTime < dateTimeEnd; iterDateTime += new TimeSpan(1, 0, 0, 0))
             {
-                fileNames.Add($"Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}n");
-                fileNames.Add($"Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}g");
-                fileNames.Add($"Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}l");
-                fileNames.Add($"Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}f");
+                fileNames.Add($"{iterDateTime.Year}/Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}n");
+                fileNames.Add($"{iterDateTime.Year}/Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}g");
+                fileNames.Add($"{iterDateTime.Year}/Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}l");
+                fileNames.Add($"{iterDateTime.Year}/Brdc{iterDateTime.DayOfYear.ToString().PadLeft(3, '0')}0.{iterDateTime.Year - 2000}f");
             }
 
             if (dateTimeEnd.DayOfYear != dateTimeStart.DayOfYear)
             {
-                fileNames.Add($"Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}n");
-                fileNames.Add($"Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}g");
-                fileNames.Add($"Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}l");
-                fileNames.Add($"Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}f");
+                fileNames.Add($"{dateTimeEnd.Year}/Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}n");
+                fileNames.Add($"{dateTimeEnd.Year}/Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}g");
+                fileNames.Add($"{dateTimeEnd.Year}/Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}l");
+                fileNames.Add($"{dateTimeEnd.Year}/Brdc{dateTimeEnd.DayOfYear.ToString().PadLeft(3, '0')}0.{dateTimeEnd.Year - 2000}f");
             }
 
             return fileNames;
+        }
+
+        public List<string> DownloadFiles(List<string> filesNames)
+        {
+            List<string> downloadedFiles = new();
+            Directory.CreateDirectory(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data/Ftp");
+
+            foreach (string fileName in filesNames)
+            {
+                downloadedFiles.Add(DownloadFile(fileName, @"E:\Projects\Visual_studio\RINEXDataAnaliser\Data/Ftp"));
+            }
+
+            return downloadedFiles;
         }
     }
 }

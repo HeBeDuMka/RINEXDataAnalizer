@@ -50,10 +50,10 @@ namespace RINEXDataAnaliser.Tests
 
             List<string> result = new List<string>
             {
-            "SU5200RUS_R_20233650000_01H_01S_MO.crx.gz",
-            "SU5200RUS_R_20233650100_01H_01S_MO.crx.gz",
-            "SU5200RUS_R_20233650200_01H_01S_MO.crx.gz",
-            "SU5200RUS_R_20233650300_01H_01S_MO.crx.gz"
+            "2023/SU5200RUS_R_20233650000_01H_01S_MO.crx.gz",
+            "2023/SU5200RUS_R_20233650100_01H_01S_MO.crx.gz",
+            "2023/SU5200RUS_R_20233650200_01H_01S_MO.crx.gz",
+            "2023/SU5200RUS_R_20233650300_01H_01S_MO.crx.gz"
             };
 
             Assert.Equal(result, ftpManager.GetObsFilePathByDate(startDateTime, endDateTime));
@@ -68,10 +68,10 @@ namespace RINEXDataAnaliser.Tests
 
             List<string> result = new List<string>
             {
-            "Brdc3650.23n",
-            "Brdc3650.23g",
-            "Brdc3650.23l",
-            "Brdc3650.23f"
+            "2023/Brdc3650.23n",
+            "2023/Brdc3650.23g",
+            "2023/Brdc3650.23l",
+            "2023/Brdc3650.23f"
             };
 
             Assert.Equal(result, ftpManager.GetNavFilesPathByDate(startDateTime, endDateTime));
@@ -86,14 +86,14 @@ namespace RINEXDataAnaliser.Tests
 
             List<string> result = new List<string>
             {
-            "Brdc3650.23n",
-            "Brdc3650.23g",
-            "Brdc3650.23l",
-            "Brdc3650.23f",
-            "Brdc0010.24n",
-            "Brdc0010.24g",
-            "Brdc0010.24l",
-            "Brdc0010.24f"
+            "2023/Brdc3650.23n",
+            "2023/Brdc3650.23g",
+            "2023/Brdc3650.23l",
+            "2023/Brdc3650.23f",
+            "2024/Brdc0010.24n",
+            "2024/Brdc0010.24g",
+            "2024/Brdc0010.24l",
+            "2024/Brdc0010.24f"
             };
 
             Assert.Equal(result, ftpManager.GetNavFilesPathByDate(startDateTime, endDateTime));

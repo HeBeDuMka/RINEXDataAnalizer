@@ -37,12 +37,12 @@
             ObsFileDateEndLabel = new Label();
             ObsFileDateStartTimePicker = new DateTimePicker();
             ObsFileDateStartLabel = new Label();
-            EphFilesGroupBox = new GroupBox();
+            DownloadedFilesGroupBox = new GroupBox();
             tableLayoutPanel8 = new TableLayoutPanel();
             tableLayoutPanel9 = new TableLayoutPanel();
             DeleteNavFileButton = new Button();
             AddNavFileButton = new Button();
-            NavFilesListBox = new ListBox();
+            DownloadedFilesListBox = new ListBox();
             ActionButtonsLableLayoutPanel = new TableLayoutPanel();
             LoadButton = new Button();
             CalculateButton = new Button();
@@ -51,6 +51,9 @@
             tableLayoutPanel2 = new TableLayoutPanel();
             UserFtpServerSettingsGroupBox = new GroupBox();
             tableLayoutPanel1 = new TableLayoutPanel();
+            tableLayoutPanel16 = new TableLayoutPanel();
+            UserServerDirectoryTextBox = new TextBox();
+            UserServerDirectoryLabel = new Label();
             tableLayoutPanel5 = new TableLayoutPanel();
             UserServerPasswordTextBox = new TextBox();
             UserServerPasswordLabel = new Label();
@@ -62,8 +65,11 @@
             UserServerAdressLabel = new Label();
             IacFtpServerSettingsGroupBox = new GroupBox();
             tableLayoutPanel6 = new TableLayoutPanel();
+            tableLayoutPanel17 = new TableLayoutPanel();
+            IacServerDirectoryTextBox = new TextBox();
+            IacServerDirectoryLabel = new Label();
             tableLayoutPanel7 = new TableLayoutPanel();
-            IacServerAdressTextBox4 = new TextBox();
+            IacServerAdressTextBox = new TextBox();
             IacServerAdressLabel = new Label();
             SettingsTab = new TabPage();
             tableLayoutPanel11 = new TableLayoutPanel();
@@ -97,7 +103,7 @@
             tableLayoutPanel10.SuspendLayout();
             ObsFileGroupBox.SuspendLayout();
             ObsDateTimeTableLayoutPanel.SuspendLayout();
-            EphFilesGroupBox.SuspendLayout();
+            DownloadedFilesGroupBox.SuspendLayout();
             tableLayoutPanel8.SuspendLayout();
             tableLayoutPanel9.SuspendLayout();
             ActionButtonsLableLayoutPanel.SuspendLayout();
@@ -105,11 +111,13 @@
             tableLayoutPanel2.SuspendLayout();
             UserFtpServerSettingsGroupBox.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
+            tableLayoutPanel16.SuspendLayout();
             tableLayoutPanel5.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
             tableLayoutPanel3.SuspendLayout();
             IacFtpServerSettingsGroupBox.SuspendLayout();
             tableLayoutPanel6.SuspendLayout();
+            tableLayoutPanel17.SuspendLayout();
             tableLayoutPanel7.SuspendLayout();
             SettingsTab.SuspendLayout();
             tableLayoutPanel11.SuspendLayout();
@@ -156,7 +164,7 @@
             tableLayoutPanel10.ColumnCount = 1;
             tableLayoutPanel10.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel10.Controls.Add(ObsFileGroupBox, 0, 0);
-            tableLayoutPanel10.Controls.Add(EphFilesGroupBox, 0, 1);
+            tableLayoutPanel10.Controls.Add(DownloadedFilesGroupBox, 0, 1);
             tableLayoutPanel10.Controls.Add(ActionButtonsLableLayoutPanel, 0, 2);
             tableLayoutPanel10.Dock = DockStyle.Fill;
             tableLayoutPanel10.Location = new Point(3, 3);
@@ -206,17 +214,17 @@
             ObsFileDateEndTimePicker.Name = "ObsFileDateEndTimePicker";
             ObsFileDateEndTimePicker.Size = new Size(142, 23);
             ObsFileDateEndTimePicker.TabIndex = 6;
-            ObsFileDateEndTimePicker.Value = new DateTime(2000, 1, 1, 0, 0, 0, 0);
+            ObsFileDateEndTimePicker.Value = new DateTime(2023, 12, 27, 0, 0, 0, 0);
             // 
             // ObsFileDateEndLabel
             // 
             ObsFileDateEndLabel.Anchor = AnchorStyles.None;
             ObsFileDateEndLabel.AutoSize = true;
-            ObsFileDateEndLabel.Location = new Point(20, 39);
+            ObsFileDateEndLabel.Location = new Point(10, 39);
             ObsFileDateEndLabel.Name = "ObsFileDateEndLabel";
-            ObsFileDateEndLabel.Size = new Size(194, 15);
+            ObsFileDateEndLabel.Size = new Size(215, 15);
             ObsFileDateEndLabel.TabIndex = 5;
-            ObsFileDateEndLabel.Text = "Дата и время начала наблюдений";
+            ObsFileDateEndLabel.Text = "Дата и время окончания наблюдений";
             // 
             // ObsFileDateStartTimePicker
             // 
@@ -227,7 +235,7 @@
             ObsFileDateStartTimePicker.Name = "ObsFileDateStartTimePicker";
             ObsFileDateStartTimePicker.Size = new Size(142, 23);
             ObsFileDateStartTimePicker.TabIndex = 3;
-            ObsFileDateStartTimePicker.Value = new DateTime(2000, 1, 1, 0, 0, 0, 0);
+            ObsFileDateStartTimePicker.Value = new DateTime(2023, 12, 27, 0, 0, 0, 0);
             // 
             // ObsFileDateStartLabel
             // 
@@ -239,22 +247,22 @@
             ObsFileDateStartLabel.TabIndex = 4;
             ObsFileDateStartLabel.Text = "Дата и время начала наблюдений";
             // 
-            // EphFilesGroupBox
+            // DownloadedFilesGroupBox
             // 
-            EphFilesGroupBox.Controls.Add(tableLayoutPanel8);
-            EphFilesGroupBox.Location = new Point(3, 93);
-            EphFilesGroupBox.Name = "EphFilesGroupBox";
-            EphFilesGroupBox.Size = new Size(389, 258);
-            EphFilesGroupBox.TabIndex = 1;
-            EphFilesGroupBox.TabStop = false;
-            EphFilesGroupBox.Text = "Файлы эфемерид";
+            DownloadedFilesGroupBox.Controls.Add(tableLayoutPanel8);
+            DownloadedFilesGroupBox.Location = new Point(3, 93);
+            DownloadedFilesGroupBox.Name = "DownloadedFilesGroupBox";
+            DownloadedFilesGroupBox.Size = new Size(389, 258);
+            DownloadedFilesGroupBox.TabIndex = 1;
+            DownloadedFilesGroupBox.TabStop = false;
+            DownloadedFilesGroupBox.Text = "Загруженные файлы";
             // 
             // tableLayoutPanel8
             // 
             tableLayoutPanel8.ColumnCount = 1;
             tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel8.Controls.Add(tableLayoutPanel9, 0, 0);
-            tableLayoutPanel8.Controls.Add(NavFilesListBox, 0, 1);
+            tableLayoutPanel8.Controls.Add(DownloadedFilesListBox, 0, 1);
             tableLayoutPanel8.Dock = DockStyle.Fill;
             tableLayoutPanel8.Location = new Point(3, 19);
             tableLayoutPanel8.Name = "tableLayoutPanel8";
@@ -302,15 +310,16 @@
             AddNavFileButton.UseVisualStyleBackColor = true;
             AddNavFileButton.Click += AddNavFileButton_Click;
             // 
-            // NavFilesListBox
+            // DownloadedFilesListBox
             // 
-            NavFilesListBox.Dock = DockStyle.Fill;
-            NavFilesListBox.FormattingEnabled = true;
-            NavFilesListBox.ItemHeight = 15;
-            NavFilesListBox.Location = new Point(3, 40);
-            NavFilesListBox.Name = "NavFilesListBox";
-            NavFilesListBox.Size = new Size(377, 193);
-            NavFilesListBox.TabIndex = 0;
+            DownloadedFilesListBox.Dock = DockStyle.Fill;
+            DownloadedFilesListBox.FormattingEnabled = true;
+            DownloadedFilesListBox.HorizontalScrollbar = true;
+            DownloadedFilesListBox.ItemHeight = 15;
+            DownloadedFilesListBox.Location = new Point(3, 40);
+            DownloadedFilesListBox.Name = "DownloadedFilesListBox";
+            DownloadedFilesListBox.Size = new Size(377, 193);
+            DownloadedFilesListBox.TabIndex = 0;
             // 
             // ActionButtonsLableLayoutPanel
             // 
@@ -338,6 +347,7 @@
             LoadButton.TabIndex = 5;
             LoadButton.Text = "Загрузить";
             LoadButton.UseVisualStyleBackColor = true;
+            LoadButton.Click += LoadButton_Click;
             // 
             // CalculateButton
             // 
@@ -402,19 +412,56 @@
             // 
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.Controls.Add(tableLayoutPanel16, 0, 3);
             tableLayoutPanel1.Controls.Add(tableLayoutPanel5, 0, 2);
             tableLayoutPanel1.Controls.Add(tableLayoutPanel4, 0, 1);
             tableLayoutPanel1.Controls.Add(tableLayoutPanel3, 0, 0);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(3, 19);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 4;
+            tableLayoutPanel1.RowCount = 5;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 22F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 22F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 22F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 34F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 22F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12F));
             tableLayoutPanel1.Size = new Size(389, 180);
             tableLayoutPanel1.TabIndex = 0;
+            // 
+            // tableLayoutPanel16
+            // 
+            tableLayoutPanel16.ColumnCount = 2;
+            tableLayoutPanel16.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 21.4099216F));
+            tableLayoutPanel16.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 78.59008F));
+            tableLayoutPanel16.Controls.Add(UserServerDirectoryTextBox, 1, 0);
+            tableLayoutPanel16.Controls.Add(UserServerDirectoryLabel, 0, 0);
+            tableLayoutPanel16.Dock = DockStyle.Fill;
+            tableLayoutPanel16.Location = new Point(3, 120);
+            tableLayoutPanel16.Name = "tableLayoutPanel16";
+            tableLayoutPanel16.RowCount = 1;
+            tableLayoutPanel16.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel16.Size = new Size(383, 33);
+            tableLayoutPanel16.TabIndex = 3;
+            // 
+            // UserServerDirectoryTextBox
+            // 
+            UserServerDirectoryTextBox.Anchor = AnchorStyles.None;
+            UserServerDirectoryTextBox.Location = new Point(85, 5);
+            UserServerDirectoryTextBox.Name = "UserServerDirectoryTextBox";
+            UserServerDirectoryTextBox.Size = new Size(294, 23);
+            UserServerDirectoryTextBox.TabIndex = 3;
+            UserServerDirectoryTextBox.Text = "/htdocs/GNSS/SU52/";
+            // 
+            // UserServerDirectoryLabel
+            // 
+            UserServerDirectoryLabel.Anchor = AnchorStyles.None;
+            UserServerDirectoryLabel.AutoSize = true;
+            UserServerDirectoryLabel.ImageAlign = ContentAlignment.BottomLeft;
+            UserServerDirectoryLabel.Location = new Point(20, 9);
+            UserServerDirectoryLabel.Name = "UserServerDirectoryLabel";
+            UserServerDirectoryLabel.Size = new Size(41, 15);
+            UserServerDirectoryLabel.TabIndex = 0;
+            UserServerDirectoryLabel.Text = "Папка";
             // 
             // tableLayoutPanel5
             // 
@@ -439,6 +486,7 @@
             UserServerPasswordTextBox.PasswordChar = '*';
             UserServerPasswordTextBox.Size = new Size(294, 23);
             UserServerPasswordTextBox.TabIndex = 3;
+            UserServerPasswordTextBox.Text = "logitech";
             // 
             // UserServerPasswordLabel
             // 
@@ -473,6 +521,7 @@
             UserServerLoginTextBox.Name = "UserServerLoginTextBox";
             UserServerLoginTextBox.Size = new Size(294, 23);
             UserServerLoginTextBox.TabIndex = 3;
+            UserServerLoginTextBox.Text = "b7_33706431";
             // 
             // UserServerLoginLabel
             // 
@@ -507,6 +556,7 @@
             UserServerAdressTextBox.Name = "UserServerAdressTextBox";
             UserServerAdressTextBox.Size = new Size(294, 23);
             UserServerAdressTextBox.TabIndex = 3;
+            UserServerAdressTextBox.Text = "ftp://ftpupload.net";
             // 
             // UserServerAdressLabel
             // 
@@ -534,22 +584,59 @@
             // 
             tableLayoutPanel6.ColumnCount = 1;
             tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel6.Controls.Add(tableLayoutPanel17, 0, 1);
             tableLayoutPanel6.Controls.Add(tableLayoutPanel7, 0, 0);
             tableLayoutPanel6.Dock = DockStyle.Fill;
             tableLayoutPanel6.Location = new Point(3, 19);
             tableLayoutPanel6.Name = "tableLayoutPanel6";
-            tableLayoutPanel6.RowCount = 2;
+            tableLayoutPanel6.RowCount = 3;
             tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 22F));
-            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 78F));
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 22F));
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 56F));
             tableLayoutPanel6.Size = new Size(389, 180);
             tableLayoutPanel6.TabIndex = 0;
+            // 
+            // tableLayoutPanel17
+            // 
+            tableLayoutPanel17.ColumnCount = 2;
+            tableLayoutPanel17.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 21.4099216F));
+            tableLayoutPanel17.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 78.59008F));
+            tableLayoutPanel17.Controls.Add(IacServerDirectoryTextBox, 1, 0);
+            tableLayoutPanel17.Controls.Add(IacServerDirectoryLabel, 0, 0);
+            tableLayoutPanel17.Dock = DockStyle.Fill;
+            tableLayoutPanel17.Location = new Point(3, 42);
+            tableLayoutPanel17.Name = "tableLayoutPanel17";
+            tableLayoutPanel17.RowCount = 1;
+            tableLayoutPanel17.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel17.Size = new Size(383, 33);
+            tableLayoutPanel17.TabIndex = 4;
+            // 
+            // IacServerDirectoryTextBox
+            // 
+            IacServerDirectoryTextBox.Anchor = AnchorStyles.None;
+            IacServerDirectoryTextBox.Location = new Point(85, 5);
+            IacServerDirectoryTextBox.Name = "IacServerDirectoryTextBox";
+            IacServerDirectoryTextBox.Size = new Size(294, 23);
+            IacServerDirectoryTextBox.TabIndex = 3;
+            IacServerDirectoryTextBox.Text = "/MCC/BRDC/";
+            // 
+            // IacServerDirectoryLabel
+            // 
+            IacServerDirectoryLabel.Anchor = AnchorStyles.None;
+            IacServerDirectoryLabel.AutoSize = true;
+            IacServerDirectoryLabel.ImageAlign = ContentAlignment.BottomLeft;
+            IacServerDirectoryLabel.Location = new Point(20, 9);
+            IacServerDirectoryLabel.Name = "IacServerDirectoryLabel";
+            IacServerDirectoryLabel.Size = new Size(41, 15);
+            IacServerDirectoryLabel.TabIndex = 0;
+            IacServerDirectoryLabel.Text = "Папка";
             // 
             // tableLayoutPanel7
             // 
             tableLayoutPanel7.ColumnCount = 2;
             tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 21.4099216F));
             tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 78.59008F));
-            tableLayoutPanel7.Controls.Add(IacServerAdressTextBox4, 1, 0);
+            tableLayoutPanel7.Controls.Add(IacServerAdressTextBox, 1, 0);
             tableLayoutPanel7.Controls.Add(IacServerAdressLabel, 0, 0);
             tableLayoutPanel7.Dock = DockStyle.Fill;
             tableLayoutPanel7.Location = new Point(3, 3);
@@ -559,14 +646,14 @@
             tableLayoutPanel7.Size = new Size(383, 33);
             tableLayoutPanel7.TabIndex = 1;
             // 
-            // IacServerAdressTextBox4
+            // IacServerAdressTextBox
             // 
-            IacServerAdressTextBox4.Anchor = AnchorStyles.None;
-            IacServerAdressTextBox4.Location = new Point(85, 5);
-            IacServerAdressTextBox4.Name = "IacServerAdressTextBox4";
-            IacServerAdressTextBox4.Size = new Size(294, 23);
-            IacServerAdressTextBox4.TabIndex = 3;
-            IacServerAdressTextBox4.Text = "ftp://ftp.glonass-iac.ru/MCC/BRDC/";
+            IacServerAdressTextBox.Anchor = AnchorStyles.None;
+            IacServerAdressTextBox.Location = new Point(85, 5);
+            IacServerAdressTextBox.Name = "IacServerAdressTextBox";
+            IacServerAdressTextBox.Size = new Size(294, 23);
+            IacServerAdressTextBox.TabIndex = 3;
+            IacServerAdressTextBox.Text = "ftp://ftp.glonass-iac.ru";
             // 
             // IacServerAdressLabel
             // 
@@ -922,7 +1009,7 @@
             ObsFileGroupBox.ResumeLayout(false);
             ObsDateTimeTableLayoutPanel.ResumeLayout(false);
             ObsDateTimeTableLayoutPanel.PerformLayout();
-            EphFilesGroupBox.ResumeLayout(false);
+            DownloadedFilesGroupBox.ResumeLayout(false);
             tableLayoutPanel8.ResumeLayout(false);
             tableLayoutPanel9.ResumeLayout(false);
             ActionButtonsLableLayoutPanel.ResumeLayout(false);
@@ -930,6 +1017,8 @@
             tableLayoutPanel2.ResumeLayout(false);
             UserFtpServerSettingsGroupBox.ResumeLayout(false);
             tableLayoutPanel1.ResumeLayout(false);
+            tableLayoutPanel16.ResumeLayout(false);
+            tableLayoutPanel16.PerformLayout();
             tableLayoutPanel5.ResumeLayout(false);
             tableLayoutPanel5.PerformLayout();
             tableLayoutPanel4.ResumeLayout(false);
@@ -938,6 +1027,8 @@
             tableLayoutPanel3.PerformLayout();
             IacFtpServerSettingsGroupBox.ResumeLayout(false);
             tableLayoutPanel6.ResumeLayout(false);
+            tableLayoutPanel17.ResumeLayout(false);
+            tableLayoutPanel17.PerformLayout();
             tableLayoutPanel7.ResumeLayout(false);
             tableLayoutPanel7.PerformLayout();
             SettingsTab.ResumeLayout(false);
@@ -968,8 +1059,8 @@
         private TabPage SettingsTab;
         private TabPage GraphTab;
         private GroupBox ObsFileGroupBox;
-        private GroupBox EphFilesGroupBox;
-        private ListBox NavFilesListBox;
+        private GroupBox DownloadedFilesGroupBox;
+        private ListBox DownloadedFilesListBox;
         private Button DeleteNavFileButton;
         private Button AddNavFileButton;
         private Button CalculateButton;
@@ -1010,7 +1101,7 @@
         private Label UserServerPasswordLabel;
         private TableLayoutPanel tableLayoutPanel6;
         private TableLayoutPanel tableLayoutPanel7;
-        private TextBox IacServerAdressTextBox4;
+        private TextBox IacServerAdressTextBox;
         private Label IacServerAdressLabel;
         private DateTimePicker ObsFileDateStartTimePicker;
         private TableLayoutPanel ObsDateTimeTableLayoutPanel;
@@ -1027,5 +1118,11 @@
         private TableLayoutPanel tableLayoutPanel14;
         private TableLayoutPanel tableLayoutPanel12;
         private TableLayoutPanel tableLayoutPanel15;
+        private TableLayoutPanel tableLayoutPanel16;
+        private TextBox UserServerDirectoryTextBox;
+        private Label UserServerDirectoryLabel;
+        private TableLayoutPanel tableLayoutPanel17;
+        private TextBox IacServerDirectoryTextBox;
+        private Label IacServerDirectoryLabel;
     }
 }

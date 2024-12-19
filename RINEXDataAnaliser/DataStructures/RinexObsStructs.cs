@@ -6,7 +6,7 @@ namespace RINEXDataAnaliser.DataStructures
     /// <summary>
     /// Класс для хранения данных о спутниках в пределах одной эпохи
     /// </summary>
-    public class RINEXObsEpochData
+    public class RinexObsEpochData
     {
         /// <summary>
         /// Время эпохи
@@ -16,10 +16,10 @@ namespace RINEXDataAnaliser.DataStructures
         /// <summary>
         /// Словарь хранящий данные всех спутников в эпохе
         /// </summary>
-        public Dictionary<string, RINEXObsSateliteData> satelitesData = new Dictionary<string, RINEXObsSateliteData>();
+        public Dictionary<string, RinexObsSateliteData> satelitesData = new Dictionary<string, RinexObsSateliteData>();
     }
 
-    public class RINEXObsSateliteMeasuring
+    public class RinexObsSateliteMeasuring
     {
         /// <summary>
         /// Поле хранящее значение измерения 
@@ -40,23 +40,23 @@ namespace RINEXDataAnaliser.DataStructures
     /// <summary>
     /// Класс для хранения данных одного спутника в эпохе
     /// </summary>
-    public class RINEXObsSateliteData
+    public class RinexObsSateliteData
     {
         /// <summary>
         /// Словарь хранящий все псевдодальности спутника в текущей эпохе
         /// </summary>
-        public Dictionary<string, RINEXObsSateliteMeasuring> pseudoranges = new();
+        public Dictionary<string, RinexObsSateliteMeasuring> pseudoranges = new();
 
         /// <summary>
         /// Словарь хранящий все псевдофазы спутника в текущей эпохе
         /// </summary>
-        public Dictionary<string, RINEXObsSateliteMeasuring> pseudophases = new();
+        public Dictionary<string, RinexObsSateliteMeasuring> pseudophases = new();
     }
 
     /// <summary>
     /// Класс для хранения данных заголовка файла наблюдений
     /// </summary>
-    public class RINEXObsHeaderData
+    public class RinexObsHeaderData
     {
         /// <summary>
         /// Строка с текущей версией RINEX файла
@@ -151,13 +151,13 @@ namespace RINEXDataAnaliser.DataStructures
         /// <summary>
         /// Список наблюдаемых типов
         /// </summary>
-        public List<RINEXObsTypes> obsTypes = new List<RINEXObsTypes>();
+        public List<RinexObsTypes> obsTypes = new List<RinexObsTypes>();
     }
 
     /// <summary>
     /// Класс для хранения наблюдаемых типов
     /// </summary>
-    public class RINEXObsTypes
+    public class RinexObsTypes
     {
         /// <summary>
         /// Код спутниковой группировки
@@ -175,24 +175,24 @@ namespace RINEXDataAnaliser.DataStructures
         public List<string> typesDescriptors = new();
     }
 
-    public class RINEXObsFile
+    public class RinexObsFile
     {
         /// <summary>
         /// Заголовок RINEX файла
         /// </summary>
-        public RINEXObsHeaderData header = new();
+        public RinexObsHeaderData header = new();
 
         /// <summary>
         /// Данные RINEX файла
         /// </summary>
-        public List<RINEXObsEpochData> epochDatas = new();
+        public List<RinexObsEpochData> epochDatas = new();
 
         public void ParseFile(string filePath, RegexManager regexManager)
         {
             // Считываем все строки из файла
             string[] fileLines = File.ReadAllLines(filePath);
             bool isHeader = true;
-            foreach(string line in File.ReadLines(filePath))
+            foreach(string line in fileLines)
             {
                 if (isHeader)
                 {
@@ -211,7 +211,7 @@ namespace RINEXDataAnaliser.DataStructures
                         match = regexManager.obsHeader["SYS / # / OBS TYPES"].Match(line);
                         if (match.Success)
                         {
-                            RINEXObsTypes obsTypes = new();
+                            RinexObsTypes obsTypes = new();
                             obsTypes.systemCode = match.Groups["Satelite_group"].Value;
                             obsTypes.typesCount = Convert.ToInt32(match.Groups["Sat_count"].Value);
                             obsTypes.typesDescriptors = match.Groups["Obs_descriptors"].Value.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList<string>();
@@ -221,7 +221,7 @@ namespace RINEXDataAnaliser.DataStructures
                     else if (line.EndsWith("END OF HEADER"))
                     {
                         isHeader = false;
-                        foreach (RINEXObsTypes obsType in header.obsTypes)
+                        foreach (RinexObsTypes obsType in header.obsTypes)
                         {
                             string regexString = @"(?<Satelite_number>\w\d{2})";
 
@@ -230,47 +230,9 @@ namespace RINEXDataAnaliser.DataStructures
                                 regexString += @"\s*(?<{}>[0-9\-]{1,10}\.\d{3})?(?<{}_LLI>[0-9 ])?(?<{}_SSI>\d)?".Replace("{}", descriptor);
                             }
 
-                            regexManager.obsEpohs.Add(obsType.systemCode, new Regex(regexString, RegexOptions.Compiled));
+                            regexManager.obsEpohs.TryAdd(obsType.systemCode, new Regex(regexString, RegexOptions.Compiled));
                         }
                     }
-                    //if (line.EndsWith("RINEX VERSION / TYPE"))
-                    //{
-                    //    match = regexManager.obsHeader["RINEX VERSION / TYPE"].Match(line);
-                    //    header.fileVersion = match.Groups["Rinex_version"].Value;
-                    //    header.sateliteSystems = match.Groups["Satelite_system"].Value;
-                    //}
-                    //else if (line.EndsWith("PGM / RUN BY / DATE"))
-                    //{
-                    //    match = regexManager.obsHeader["PGM / RUN BY / DATE"].Match(line);
-                    //    header.programNameCreate = match.Groups["Record_program_name"].Value;
-                    //    header.dateTimeCreate = DateTime.ParseExact(match.Groups["Record_date_time"].Value, "yyyyMMdd hhmmss", CultureInfo.InvariantCulture);
-                    //    header.timeZone = match.Groups["Time_zone"].Value;
-                    //}
-                    //else if (line.EndsWith("COMMENT"))
-                    //{
-                    //    match = regexManager.obsHeader["COMMENT"].Match(line);
-                    //    header.comments.Add(match.Groups[0].Value);
-                    //}
-                    //else if (line.EndsWith("MARKER NAME"))
-                    //{
-                    //    match = regexManager.obsHeader["MARKER_NAME"].Match(line);
-                    //    header.antennaMarkerName = match.Groups["Marker_name"].Value;
-                    //}
-                    //else if (line.EndsWith("MARKER NUMBER"))
-                    //{
-                    //    match = regexManager.obsHeader["MARKER_NUMBER"].Match(line);
-                    //    header.antennaMarkerNumber = match.Groups["Marker_number"].Value;
-                    //}
-                    //else if (line.EndsWith("MARKER TYPE"))
-                    //{
-                    //    match = regexManager.obsHeader["MARKER TYPE"].Match(line);
-                    //    header.antennaMarkerNumber = match.Groups["Marker_type"].Value;
-                    //}
-                    //else if (line.EndsWith("OBSERVER / AGENCY"))
-                    //{
-                    //    match = regexManager.obsHeader["MARKER_NUMBER"].Match(line);
-                    //    header.observerName = match.Groups["Marker_number"].Value;
-                    //}
                 }
                 else
                 {
@@ -279,7 +241,7 @@ namespace RINEXDataAnaliser.DataStructures
                         Match match = regexManager.obsEpohs["Date"].Match(line);
                         if (match.Success)
                         {
-                            RINEXObsEpochData epochData = new RINEXObsEpochData();
+                            RinexObsEpochData epochData = new RinexObsEpochData();
                             epochData.epochTime = new DateTime(Convert.ToInt16(match.Groups["Year"].Value),
                                                                Convert.ToInt16(match.Groups["Month"].Value),
                                                                Convert.ToInt16(match.Groups["Day"].Value),
@@ -297,10 +259,10 @@ namespace RINEXDataAnaliser.DataStructures
                             match.Groups["Satelite_number"].Value.StartsWith("R") ||
                             match.Groups["Satelite_number"].Value.StartsWith("G")))
                         {
-                            RINEXObsSateliteData sateliteData = new();
+                            RinexObsSateliteData sateliteData = new();
                             for (int i = 2; i < match.Groups.Count; i += 3)
                             {
-                                RINEXObsSateliteMeasuring sateliteMeasuring = new();
+                                RinexObsSateliteMeasuring sateliteMeasuring = new();
                                 if (match.Groups[i].Value != "")
                                 {
                                     sateliteMeasuring.value = Convert.ToDouble(match.Groups[i].Value, CultureInfo.InvariantCulture);

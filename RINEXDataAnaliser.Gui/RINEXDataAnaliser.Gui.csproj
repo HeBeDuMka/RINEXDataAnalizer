@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RINEXDataAnaliser\RINEXDataAnaliser.csproj" />
+    <ProjectReference Include="..\RINEXDataAnaliser\RinexDataAnaliser.Core.csproj" />
   </ItemGroup>
 
 </Project>

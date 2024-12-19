@@ -1,4 +1,4 @@
-namespace RINEXDataAnaliser.Gui
+namespace RinexDataAnaliser.Gui
 {
     internal static class Program
     {

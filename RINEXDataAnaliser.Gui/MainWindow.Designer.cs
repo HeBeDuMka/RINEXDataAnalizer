@@ -1,4 +1,4 @@
-﻿namespace RINEXDataAnaliser.Gui
+﻿namespace RinexDataAnaliser.Gui
 {
     partial class MainWindow
     {

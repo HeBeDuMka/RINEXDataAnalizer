@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace RINEXDataAnaliser.DataStructures
+namespace RinexDataAnaliser.DataStructures
 {
     /// <summary>
     /// Класс для хранения координат в системе XYZ

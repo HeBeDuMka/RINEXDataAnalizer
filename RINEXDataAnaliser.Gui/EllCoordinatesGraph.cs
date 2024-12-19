@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using RINEXDataAnaliser;
-using RINEXDataAnaliser.DataStructures;
+using RinexDataAnaliser;
+using RinexDataAnaliser.DataStructures;
 using ScottPlot;
 
-namespace RINEXDataAnaliser.Gui
+namespace RinexDataAnaliser.Gui
 {
     public partial class EllCoordinatesGraph : Form
     {

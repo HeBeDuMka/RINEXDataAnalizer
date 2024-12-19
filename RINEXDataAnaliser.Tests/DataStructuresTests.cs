@@ -1,8 +1,8 @@
 ﻿using Xunit;
-using RINEXDataAnaliser.DataStructures;
+using RinexDataAnaliser.DataStructures;
 using System.Text.RegularExpressions;
 
-namespace RINEXDataAnaliser.Tests
+namespace RinexDataAnaliser.Tests
 {
 	public class DataStructuresTests
 	{

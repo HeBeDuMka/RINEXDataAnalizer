@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.Globalization;
 
-namespace RINEXDataAnaliser.DataStructures
+namespace RinexDataAnaliser.DataStructures
 {
     /// <summary>
     /// Класс для хранения данных о спутниках в пределах одной эпохи

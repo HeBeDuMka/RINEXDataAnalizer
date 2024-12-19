@@ -1,4 +1,4 @@
-﻿using RINEXDataAnaliser.DataStructures;
+﻿using RinexDataAnaliser.DataStructures;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace RINEXDataAnaliser.Gui
+namespace RinexDataAnaliser.Gui
 {
     public partial class XYZCoordinatesGraph : Form
     {

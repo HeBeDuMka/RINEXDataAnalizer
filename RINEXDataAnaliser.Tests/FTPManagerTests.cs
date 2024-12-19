@@ -1,4 +1,4 @@
-﻿using RINEXDataAnaliser.DataStructures;
+﻿using RinexDataAnaliser.DataStructures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace RINEXDataAnaliser.Tests
+namespace RinexDataAnaliser.Tests
 {
     public class FTPManagerTests
     {

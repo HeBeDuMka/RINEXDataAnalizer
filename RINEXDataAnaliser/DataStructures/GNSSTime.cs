@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RINEXDataAnaliser.DataStructures
+namespace RinexDataAnaliser.DataStructures
 {
 
     public class GNSSTime

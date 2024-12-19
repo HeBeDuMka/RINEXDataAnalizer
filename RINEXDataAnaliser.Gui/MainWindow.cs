@@ -1,9 +1,9 @@
 using System.Windows.Forms;
-using RINEXDataAnaliser;
-using RINEXDataAnaliser.DataStructures;
+using RinexDataAnaliser;
+using RinexDataAnaliser.DataStructures;
 using System.Diagnostics;
 
-namespace RINEXDataAnaliser.Gui
+namespace RinexDataAnaliser.Gui
 {
     public partial class MainWindow : Form
     {
@@ -11,7 +11,7 @@ namespace RINEXDataAnaliser.Gui
         RINEXNavGLONASSFile glonassNavFile = new();
         RINEXNavGPSFile gpsNavFile = new();
         RINEXNavBeidouFile beidouFile = new();
-        RINEXObsFile obsFile = new();
+        RinexObsFile obsFile = new();
         RegexManager regexManager = new();
         List<CalcEpoch> satelitesCoordsAndPseudoranges = new();
         List<XYZCoordinates> reciverCoordinates = new();

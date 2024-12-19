@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RINEXDataAnaliser;
-using RINEXDataAnaliser.DataStructures;
+using RinexDataAnaliser;
+using RinexDataAnaliser.DataStructures;
 using ScottPlot;
 
-namespace RINEXDataAnaliser.Tests
+namespace RinexDataAnaliser.Tests
 {
     //public class Coordinates_test
     //{
@@ -47,7 +47,7 @@ namespace RINEXDataAnaliser.Tests
     //    [Fact]
     //    public void testCalcutateReciverCoordinates_1()
     //    {
-    //        string workingDir = @"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\";
+    //        string workingDir = @"E:\Projects\Visual_studio\RinexDataAnaliser\Data\";
     //        Logger.OpenLogFile(Path.Combine(workingDir, $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}_test.txt"));
     //        List<CalcEpoch> epoches = new();
     //        CalcEpoch epoh = new CalcEpoch();
@@ -148,7 +148,7 @@ namespace RINEXDataAnaliser.Tests
     //    [Fact]
     //    public void testCalcutateReciverCoordinates4Satelites()
     //    {
-    //        string workingDir = @"E:\Projects\Visual_studio\RINEXDataAnaliser\Data\";
+    //        string workingDir = @"E:\Projects\Visual_studio\RinexDataAnaliser\Data\";
     //        Logger.OpenLogFile(Path.Combine(workingDir, $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}_test.txt"));
     //        List<CalcEpoch> epoches = new();
     //        CalcEpoch epoh = new CalcEpoch();

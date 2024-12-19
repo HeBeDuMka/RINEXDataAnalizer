@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace RINEXDataAnaliser
+namespace RinexDataAnaliser
 {
     /// <summary>
     /// Класс для общения с FTP сервером
@@ -139,11 +139,11 @@ namespace RINEXDataAnaliser
         public List<string> DownloadFiles(List<string> filesNames)
         {
             List<string> downloadedFiles = new();
-            Directory.CreateDirectory(@"E:\Projects\Visual_studio\RINEXDataAnaliser\Data/Ftp");
+            Directory.CreateDirectory(@"E:\Projects\Visual_studio\RinexDataAnaliser\Data/Ftp");
 
             foreach (string fileName in filesNames)
             {
-                downloadedFiles.Add(DownloadFile(fileName, @"E:\Projects\Visual_studio\RINEXDataAnaliser\Data/Ftp"));
+                downloadedFiles.Add(DownloadFile(fileName, @"E:\Projects\Visual_studio\RinexDataAnaliser\Data/Ftp"));
             }
 
             return downloadedFiles;

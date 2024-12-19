@@ -1,4 +1,4 @@
-﻿using RINEXDataAnaliser.DataStructures;
+﻿using RinexDataAnaliser.DataStructures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using MathNet.Numerics.LinearAlgebra.Solvers;
 using MathNet.Numerics.LinearAlgebra.Double;
 using System.Runtime.Serialization.Formatters;
 
-namespace RINEXDataAnaliser
+namespace RinexDataAnaliser
 {
     [Flags]
     public enum GNSSSystem
@@ -30,8 +30,8 @@ namespace RINEXDataAnaliser
 
     public class SatData
     {
-        public Dictionary<string, RINEXObsSateliteMeasuring> pseudoranges = new();
-        public Dictionary<string, RINEXObsSateliteMeasuring> pseudophases = new();
+        public Dictionary<string, RinexObsSateliteMeasuring> pseudoranges = new();
+        public Dictionary<string, RinexObsSateliteMeasuring> pseudophases = new();
         public XYZCoordinates coordinates = new();
         public double deltaSysTime;
     }
@@ -320,14 +320,14 @@ namespace RINEXDataAnaliser
 
         #endregion
 
-        public static List<CalcEpoch> FindSateliteCoord(RINEXObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, RINEXNavGALILEOFile navGALILEOFile,
+        public static List<CalcEpoch> FindSateliteCoord(RinexObsFile obsFile, RINEXNavGPSFile navGPSFile, RINEXNavGLONASSFile navGLONASSFile, RINEXNavGALILEOFile navGALILEOFile,
             RINEXNavBeidouFile navBeidouFile, GNSSSystem calcOptions,
             bool useRelativeCorr, bool useIonoDelayCorr, bool useTropoDelayCorr)
         {
             List<CalcEpoch> calcEpoches = new();
             CalcEpoch calcEpoch;
 
-            foreach (RINEXObsEpochData reciverEpohData in obsFile.epochDatas)
+            foreach (RinexObsEpochData reciverEpohData in obsFile.epochDatas)
             {
                 calcEpoch = new();
                 Dictionary<string, SatData> satelitesData = new();
